@@ -1,0 +1,47 @@
+import { Dimensions, PixelRatio } from 'react-native';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Base design width (iPhone SE / small Android)
+const BASE_WIDTH = 375;
+
+export const scale = (size: number): number => {
+  const ratio = SCREEN_WIDTH / BASE_WIDTH;
+  const newSize = size * ratio;
+  return Math.round(PixelRatio.roundToNearestPixel(newSize));
+};
+
+export const moderateScale = (size: number, factor = 0.5): number => {
+  return size + (scale(size) - size) * factor;
+};
+
+export const Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  xxxl: 32,
+} as const;
+
+export const FontSize = {
+  xs: moderateScale(10),
+  sm: moderateScale(12),
+  md: moderateScale(14),
+  lg: moderateScale(16),
+  xl: moderateScale(18),
+  xxl: moderateScale(22),
+  xxxl: moderateScale(28),
+  display: moderateScale(34),
+} as const;
+
+export const BorderRadius = {
+  sm: 6,
+  md: 10,
+  lg: 14,
+  xl: 20,
+  full: 999,
+} as const;
+
+export { SCREEN_WIDTH, SCREEN_HEIGHT };
