@@ -68,6 +68,9 @@ export default function CategoryScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   banner: {
+    maxWidth: 840,
+    width: '100%',
+    alignSelf: 'center',
     padding: Spacing.xl,
     alignItems: 'center',
     gap: 4,
@@ -76,6 +79,9 @@ const styles = StyleSheet.create({
   bannerArabic: { fontWeight: '600' },
   bannerDesc: {},
   list: {
+    maxWidth: 840,
+    width: '100%',
+    alignSelf: 'center',
     padding: Spacing.lg,
   },
 });

@@ -113,7 +113,12 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1,
+    maxWidth: 840,
+    width: '100%',
+    alignSelf: 'center',
+  },
   header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.lg, paddingBottom: Spacing.sm },
   title: { fontWeight: '800' },
   searchBar: {

@@ -226,6 +226,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
   },
   topBar: {
+    maxWidth: 640,
+    width: '100%',
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -263,6 +266,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    maxWidth: 640,
+    width: '100%',
+    alignSelf: 'center',
     paddingHorizontal: Spacing.xl,
     paddingTop: Spacing.md,
     paddingBottom: Spacing.xxl,
@@ -408,6 +414,9 @@ const styles = StyleSheet.create({
     color: '#C62828',
   },
   footer: {
+    maxWidth: 640,
+    width: '100%',
+    alignSelf: 'center',
     paddingHorizontal: Spacing.xl,
     paddingBottom: Platform.OS === 'android' ? 24 : 16,
     paddingTop: 8,

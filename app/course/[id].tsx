@@ -146,7 +146,12 @@ export default function CourseScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  list: { padding: Spacing.lg },
+  list: {
+    maxWidth: 840,
+    width: '100%',
+    alignSelf: 'center',
+    padding: Spacing.lg,
+  },
   headerSection: { marginBottom: Spacing.lg },
   courseTitle: { fontWeight: '800', marginBottom: Spacing.sm },
   courseDesc: { lineHeight: 22, marginBottom: Spacing.lg },

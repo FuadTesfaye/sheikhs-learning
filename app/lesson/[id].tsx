@@ -273,9 +273,17 @@ export default function LessonScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { paddingBottom: 40 },
+  content: {
+    maxWidth: 840,
+    width: '100%',
+    alignSelf: 'center',
+    paddingBottom: Spacing.xxxl,
+  },
   playerArea: {
     height: 220,
+    borderRadius: BorderRadius.lg,
+    marginHorizontal: Spacing.lg,
+    marginTop: Spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
@@ -329,6 +337,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     justifyContent: 'center',
+    flexWrap: 'wrap',
     gap: Spacing.md,
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing.xl,

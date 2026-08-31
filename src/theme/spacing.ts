@@ -4,9 +4,12 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Base design width (iPhone SE / small Android)
 const BASE_WIDTH = 375;
+export const MAX_CONTENT_WIDTH = 840;
 
 export const scale = (size: number): number => {
-  const ratio = SCREEN_WIDTH / BASE_WIDTH;
+  // Clamp effective screen width between 320 and 520 for typography/icon scaling
+  const effectiveWidth = Math.min(Math.max(SCREEN_WIDTH, 320), 520);
+  const ratio = effectiveWidth / BASE_WIDTH;
   const newSize = size * ratio;
   return Math.round(PixelRatio.roundToNearestPixel(newSize));
 };

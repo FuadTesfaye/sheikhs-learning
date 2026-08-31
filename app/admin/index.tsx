@@ -292,9 +292,18 @@ export default function AdminDashboardScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { padding: Spacing.lg },
+  scrollContent: {
+    maxWidth: 840,
+    width: '100%',
+    alignSelf: 'center',
+    padding: Spacing.lg,
+    paddingBottom: Spacing.xxxl,
+  },
   lockContainer: {
     flex: 1,
+    maxWidth: 480,
+    width: '100%',
+    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     padding: Spacing.xl,
@@ -360,7 +369,9 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   kpiCard: {
-    width: '47.5%',
+    flexBasis: 150,
+    flexGrow: 1,
+    minWidth: 140,
     padding: Spacing.md,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,

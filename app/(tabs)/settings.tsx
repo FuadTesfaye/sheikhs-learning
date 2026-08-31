@@ -58,7 +58,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl }]}>Settings</Text>
         </View>
@@ -195,6 +195,12 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  scrollContent: {
+    maxWidth: 840,
+    width: '100%',
+    alignSelf: 'center',
+    paddingBottom: Spacing.xxl,
+  },
   header: {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.lg,

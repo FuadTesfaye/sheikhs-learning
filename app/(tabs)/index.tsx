@@ -42,7 +42,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
           <View>
@@ -133,8 +133,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  container: { flex: 1 },
+  scrollContent: {
+    maxWidth: 840,
+    width: '100%',
+    alignSelf: 'center',
+    paddingBottom: Spacing.xxl,
   },
   header: {
     flexDirection: 'row',
@@ -196,9 +200,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: Spacing.md,
+    justifyContent: 'flex-start',
   },
   categoryItem: {
-    width: '50%',
+    flexBasis: '50%',
+    maxWidth: '50%',
     padding: Spacing.xs,
   },
   coursesList: {
