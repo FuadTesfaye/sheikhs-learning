@@ -1,4 +1,5 @@
 import { Category, Course, Lesson } from '../types';
+import { getR2Url } from '../config/cloudflare';
 
 export const categories: Category[] = [
   { id: 'cat-1', name: 'Aqeedah', arabicName: 'عقيدة', description: 'Islamic Creed and Belief', icon: 'book', color: '#1B5E20', courseCount: 4 },
@@ -12,7 +13,7 @@ export const categories: Category[] = [
 ];
 
 export const courses: Course[] = [
-  { id: 'crs-1', categoryId: 'cat-1', title: 'Foundations of Aqeedah', description: 'A comprehensive introduction to Islamic creed covering the six pillars of Iman.', order: 1, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 12, level: 'Beginner' },
+  { id: 'crs-1', categoryId: 'cat-1', title: 'Kitab At-Tawheed: Foundations of Aqeedah', description: 'The comprehensive foundational study of Islamic monotheism (Tawheed), its reality, virtues, and protection against polytheism.', order: 1, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 12, level: 'Beginner' },
   { id: 'crs-2', categoryId: 'cat-1', title: 'Advanced Tawheed Studies', description: 'Deep dive into the categories of Tawheed and their implications.', order: 2, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 8, level: 'Advanced' },
   { id: 'crs-3', categoryId: 'cat-2', title: 'Tafsir of Surah Al-Fatiha', description: 'Detailed exegesis of the opening chapter of the Quran.', order: 1, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 6, level: 'Beginner' },
   { id: 'crs-4', categoryId: 'cat-2', title: 'Tafsir of Juz Amma', description: 'Explanation of the 30th part of the Quran, surah by surah.', order: 2, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 15, level: 'Intermediate' },
@@ -23,26 +24,73 @@ export const courses: Course[] = [
   { id: 'crs-9', categoryId: 'cat-7', title: 'Tajweed Fundamentals', description: 'Master the rules of Quran recitation from Noon Sakinah to Madd.', order: 1, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 8, level: 'Beginner' },
 ];
 
-const generateLessons = (courseId: string, count: number, type: 'video' | 'audio' | 'pdf' = 'video'): Lesson[] => {
+const generateLessons = (courseId: string, count: number, type: 'video' | 'audio' | 'pdf' = 'audio'): Lesson[] => {
   const titles: Record<string, string[]> = {
-    'crs-1': ['Introduction to Aqeedah', 'The Meaning of La ilaha illallah', 'Belief in Allah', 'Belief in Angels', 'Belief in the Books', 'Belief in the Messengers', 'Belief in the Last Day', 'Belief in Qadar', 'Nullifiers of Islam', 'Types of Shirk', 'Tawassul and its Rulings', 'Summary and Review'],
-    'crs-3': ['Introduction to Al-Fatiha', 'Bismillah ir-Rahman ir-Raheem', 'Alhamdulillahi Rabbil Alameen', 'Ar-Rahman Ar-Raheem', 'Maliki Yawm id-Deen', 'Iyyaka Na\'budu wa Iyyaka Nasta\'een'],
-    'crs-5': ['Hadith 1: Actions by Intentions', 'Hadith 2: Hadith of Jibreel', 'Hadith 3: Pillars of Islam', 'Hadith 4: Stages of Creation', 'Hadith 5: Rejection of Innovations', 'Hadith 6: The Halal and Haram', 'Hadith 7: The Religion is Advice', 'Hadith 8: Sanctity of a Muslim', 'Hadith 9: Obligations within Capacity', 'Hadith 10: Wholesome Earnings'],
+    'crs-1': [
+      'Introduction to Kitab At-Tawheed',
+      'The Obligation of Tawheed and Its Virtues',
+      'Whoever Purifies Tawheed Enters Paradise without Reckoning',
+      'Fear of Shirk (Associating Partners with Allah)',
+      'The Call to the Testimony of La ilaha illallah',
+      'Explanation of Tawheed and the Shahadah',
+      'Ruqyah, Amulets, and Superstitions',
+      'Seeking Blessings from Trees, Stones, and Relics',
+      'Slaughtering for Other than Allah',
+      'Vows and Seeking Refuge in Other than Allah',
+      'Intercession (Shafa’ah) and Its Categories',
+      'Summary and Review of Foundations',
+    ],
+    'crs-3': [
+      'Introduction to Al-Fatiha',
+      'Bismillah ir-Rahman ir-Raheem',
+      'Alhamdulillahi Rabbil Alameen',
+      'Ar-Rahman Ar-Raheem',
+      'Maliki Yawm id-Deen',
+      'Iyyaka Na\'budu wa Iyyaka Nasta\'een',
+    ],
+    'crs-5': [
+      'Hadith 1: Actions by Intentions',
+      'Hadith 2: Hadith of Jibreel',
+      'Hadith 3: Pillars of Islam',
+      'Hadith 4: Stages of Creation',
+      'Hadith 5: Rejection of Innovations',
+      'Hadith 6: The Halal and Haram',
+      'Hadith 7: The Religion is Advice',
+      'Hadith 8: Sanctity of a Muslim',
+      'Hadith 9: Obligations within Capacity',
+      'Hadith 10: Wholesome Earnings',
+    ],
   };
 
-  return Array.from({ length: count }, (_, i) => ({
-    id: `${courseId}-les-${i + 1}`,
-    courseId,
-    title: titles[courseId]?.[i] || `Lesson ${i + 1}`,
-    description: `Part ${i + 1} of the course series.`,
-    duration: 1200 + Math.floor(Math.random() * 1800),
-    order: i + 1,
-    type: i % 5 === 4 ? 'pdf' : (i % 3 === 2 ? 'audio' : type),
-    mediaUrl: `https://example.com/media/${courseId}/lesson-${i + 1}.mp4`,
-    audioOnlyUrl: `https://example.com/media/${courseId}/lesson-${i + 1}.mp3`,
-    pdfUrl: i % 5 === 4 ? `https://example.com/media/${courseId}/lesson-${i + 1}.pdf` : undefined,
-    transcriptText: 'Transcript content will appear here when available.',
-  }));
+  return Array.from({ length: count }, (_, i) => {
+    const lessonNum = String(i + 1).padStart(2, '0');
+    // Real Cloudflare R2 audio & pdf for Kitab At-Tawheed
+    const isTawheed = courseId === 'crs-1';
+    const audioUrl = isTawheed
+      ? getR2Url(`kitabu-tawhid/lesson-${lessonNum}.mp3`)
+      : `https://example.com/media/${courseId}/lesson-${i + 1}.mp3`;
+    const pdfUrl = isTawheed && i === 0
+      ? getR2Url('kitabu-tawhid/lesson-01.pdf')
+      : (i % 5 === 4 ? `https://example.com/media/${courseId}/lesson-${i + 1}.pdf` : undefined);
+
+    return {
+      id: `${courseId}-les-${i + 1}`,
+      courseId,
+      title: titles[courseId]?.[i] || `Lesson ${i + 1}`,
+      description: isTawheed
+        ? `Comprehensive explanation of Kitab At-Tawheed lesson ${i + 1} with authentic audio from the Sheikh.`
+        : `Part ${i + 1} of the course series.`,
+      duration: isTawheed ? (i === 0 ? 3360 : 1800 + (i * 120)) : (1200 + Math.floor(Math.random() * 1800)),
+      order: i + 1,
+      type: isTawheed ? 'audio' : (i % 5 === 4 ? 'pdf' : (i % 3 === 2 ? 'audio' : type)),
+      mediaUrl: audioUrl,
+      audioOnlyUrl: audioUrl,
+      pdfUrl,
+      transcriptText: isTawheed
+        ? 'Full transcription and study notes for Kitab At-Tawheed.'
+        : 'Transcript content will appear here when available.',
+    };
+  });
 };
 
 export const lessons: Lesson[] = [

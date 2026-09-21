@@ -158,5 +158,38 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     settings.setOnboardingCompleted(true);
     expect(useSettingsStore.getState().onboardingCompleted).toBe(true);
   });
+
+  it('verifies Cloudflare R2 integration and dual (audio & PDF) download resolution', async () => {
+    const { getR2Url, CLOUDFLARE_R2_CONFIG } = await import('../src/config/cloudflare');
+    expect(CLOUDFLARE_R2_CONFIG.bucketName).toBe('sheikhs-learning');
+    expect(CLOUDFLARE_R2_CONFIG.publicUrl).toContain('r2.dev');
+
+    const testUrl = getR2Url('kitabu-tawhid/lesson-01.mp3');
+    expect(testUrl).toBe('https://pub-fef6f759612f4507b40841db6e61c2f4.r2.dev/kitabu-tawhid/lesson-01.mp3');
+
+    // Verify Tawheed lessons use R2 URLs
+    const tawheedLesson = lessons.find(l => l.courseId === 'crs-1');
+    expect(tawheedLesson).toBeDefined();
+    expect(tawheedLesson?.mediaUrl).toContain('r2.dev/kitabu-tawhid');
+    expect(tawheedLesson?.pdfUrl).toContain('r2.dev/kitabu-tawhid/lesson-01.pdf');
+
+    // Download both audio and PDF for lesson 1
+    const downloadStore = useDownloadStore.getState();
+    downloadStore.clearAllDownloads();
+
+    if (tawheedLesson) {
+      DownloadService.downloadLesson(tawheedLesson, 'audio');
+      DownloadService.downloadLesson(tawheedLesson, 'pdf');
+
+      const allDownloads = useDownloadStore.getState().getAllDownloads();
+      expect(allDownloads.length).toBe(2);
+
+      const audioDl = allDownloads.find(d => d.format === 'audio');
+      const pdfDl = allDownloads.find(d => d.format === 'pdf');
+      expect(audioDl).toBeDefined();
+      expect(pdfDl).toBeDefined();
+    }
+  });
 });
+
 

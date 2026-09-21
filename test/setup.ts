@@ -41,3 +41,19 @@ mock.module('react-native', () => {
     useColorScheme: () => 'light',
   };
 });
+
+const fileSystemMock = {
+  documentDirectory: 'file:///data/user/0/com.sheikh.learning/files/',
+  cacheDirectory: 'file:///data/user/0/com.sheikh.learning/cache/',
+  downloadAsync: async () => ({ uri: 'file:///mocked/path.mp3', status: 200 }),
+  createDownloadResumable: () => ({
+    downloadAsync: async () => ({ uri: 'file:///mocked/path.mp3', status: 200 }),
+    pauseAsync: async () => {},
+    resumeAsync: async () => ({ uri: 'file:///mocked/path.mp3', status: 200 }),
+  }),
+};
+
+mock.module('expo-file-system', () => fileSystemMock);
+mock.module('expo-file-system/legacy', () => fileSystemMock);
+
+

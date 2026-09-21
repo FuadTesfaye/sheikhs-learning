@@ -39,18 +39,33 @@ export default function LessonScreen() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const downloadsMap = useDownloadStore(s => s.downloads);
-  const downloadItem = Object.values(downloadsMap).find(d => d.lessonId === id);
-  const isDownloaded = downloadItem?.status === 'completed';
-  const isDownloading = downloadItem?.status === 'downloading';
+  const audioDownload = Object.values(downloadsMap).find(d => d.lessonId === id && d.format !== 'pdf');
+  const isAudioDownloaded = audioDownload?.status === 'completed';
+  const isAudioDownloading = audioDownload?.status === 'downloading';
 
-  const handleDownload = () => {
-    if (isDownloaded) {
-      Alert.alert('Downloaded', 'This lesson is already available offline.');
+  const pdfDownload = Object.values(downloadsMap).find(d => d.lessonId === id && d.format === 'pdf');
+  const isPdfDownloaded = pdfDownload?.status === 'completed';
+  const isPdfDownloading = pdfDownload?.status === 'downloading';
+
+  const handleDownloadAudio = () => {
+    if (isAudioDownloaded) {
+      Alert.alert('Downloaded', 'Audio is already downloaded for offline playback.');
       return;
     }
     if (lesson) {
-      DownloadService.downloadLesson(lesson);
-      Alert.alert('Download Started', 'Lesson is downloading for offline playback.');
+      DownloadService.downloadLesson(lesson, 'audio');
+      Alert.alert('Download Started', 'Audio lesson is downloading.');
+    }
+  };
+
+  const handleDownloadPdf = () => {
+    if (isPdfDownloaded) {
+      Alert.alert('Downloaded', 'PDF notes are already downloaded.');
+      return;
+    }
+    if (lesson && lesson.pdfUrl) {
+      DownloadService.downloadLesson(lesson, 'pdf');
+      Alert.alert('Download Started', 'PDF notes are downloading.');
     }
   };
 
@@ -217,27 +232,53 @@ export default function LessonScreen() {
         {/* Actions */}
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[styles.actionBtn, { backgroundColor: isDownloaded ? colors.success + '18' : colors.surfaceVariant }]}
-            onPress={handleDownload}
+            style={[styles.actionBtn, { backgroundColor: isAudioDownloaded ? colors.success + '18' : colors.surfaceVariant }]}
+            onPress={handleDownloadAudio}
           >
             <Ionicons
-              name={isDownloaded ? 'checkmark-circle-outline' : isDownloading ? 'arrow-down-circle-outline' : 'cloud-download-outline'}
+              name={isAudioDownloaded ? 'checkmark-circle-outline' : isAudioDownloading ? 'arrow-down-circle-outline' : 'cloud-download-outline'}
               size={20}
-              color={isDownloaded ? colors.success : colors.text}
+              color={isAudioDownloaded ? colors.success : colors.text}
             />
             <Text
               style={[
                 styles.actionText,
-                { color: isDownloaded ? colors.success : colors.text, fontSize: fonts.sm },
+                { color: isAudioDownloaded ? colors.success : colors.text, fontSize: fonts.sm },
               ]}
             >
-              {isDownloaded
-                ? 'Downloaded ✓'
-                : isDownloading
-                ? `Downloading ${Math.round((downloadItem?.progress || 0) * 100)}%`
-                : 'Download'}
+              {isAudioDownloaded
+                ? 'Audio Saved ✓'
+                : isAudioDownloading
+                ? `Downloading ${Math.round((audioDownload?.progress || 0) * 100)}%`
+                : 'Download Audio'}
             </Text>
           </TouchableOpacity>
+
+          {lesson.pdfUrl && (
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: isPdfDownloaded ? colors.success + '18' : colors.surfaceVariant }]}
+              onPress={handleDownloadPdf}
+            >
+              <Ionicons
+                name={isPdfDownloaded ? 'checkmark-circle-outline' : isPdfDownloading ? 'arrow-down-circle-outline' : 'document-text-outline'}
+                size={20}
+                color={isPdfDownloaded ? colors.success : colors.text}
+              />
+              <Text
+                style={[
+                  styles.actionText,
+                  { color: isPdfDownloaded ? colors.success : colors.text, fontSize: fonts.sm },
+                ]}
+              >
+                {isPdfDownloaded
+                  ? 'PDF Saved ✓'
+                  : isPdfDownloading
+                  ? `Downloading ${Math.round((pdfDownload?.progress || 0) * 100)}%`
+                  : 'Download PDF'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             style={[styles.actionBtn, { backgroundColor: colors.surfaceVariant }]}
             onPress={handleShare}
