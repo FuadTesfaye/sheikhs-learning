@@ -93,11 +93,60 @@ export default function AboutScreen() {
           </View>
         </View>
 
-        {/* Section 2: What is Bunyan? */}
+        {/* Section 2: The Courses & Curricula */}
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconBox, { backgroundColor: '#0D47A118' }]}>
-              <Ionicons name="layers" size={22} color="#0D47A1" />
+              <Ionicons name="book-outline" size={22} color="#0D47A1" />
+            </View>
+            <View style={styles.headerTextGroup}>
+              <Text style={[styles.cardTitle, { color: colors.text, fontSize: fonts.lg }]}>
+                The Courses & Curricula
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontSize: fonts.xs }]}>
+                مَنَاهِجُ الدِّرَاسَةِ وَالعِلْمِ
+              </Text>
+            </View>
+          </View>
+
+          <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md }]}>
+            The Prophet ﷺ said: <Text style={{ fontStyle: 'italic', fontWeight: '600' }}>"Whoever treads a path seeking sacred knowledge, Allah makes easy for him a path to Paradise."</Text> (Sahih Muslim)
+          </Text>
+
+          <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md, marginTop: 4 }]}>
+            Our curriculum features organized modular series across Aqeedah, Tafsir, Hadith, Fiqh, Seerah, and Arabic. Lessons are arranged from foundational primers to advanced studies.
+          </Text>
+
+          {/* Features List */}
+          <View style={styles.pillarList}>
+            <View style={styles.pillarRow}>
+              <Ionicons name="checkmark-circle" size={18} color="#0D47A1" />
+              <Text style={[styles.pillarText, { color: colors.text }]}>
+                <Text style={{ fontWeight: '700' }}>Structured Curricula:</Text> Clear progression across the core Islamic disciplines.
+              </Text>
+            </View>
+
+            <View style={styles.pillarRow}>
+              <Ionicons name="checkmark-circle" size={18} color="#0D47A1" />
+              <Text style={[styles.pillarText, { color: colors.text }]}>
+                <Text style={{ fontWeight: '700' }}>Offline-First:</Text> Download audio and video to study anytime, anywhere without data costs.
+              </Text>
+            </View>
+
+            <View style={styles.pillarRow}>
+              <Ionicons name="checkmark-circle" size={18} color="#0D47A1" />
+              <Text style={[styles.pillarText, { color: colors.text }]}>
+                <Text style={{ fontWeight: '700' }}>Smart Resume:</Text> Automatically remembers your playback position across lessons.
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Section 3: What is Bunyan? */}
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.cardHeader}>
+            <View style={[styles.iconBox, { backgroundColor: '#BF360C18' }]}>
+              <Ionicons name="layers" size={22} color="#BF360C" />
             </View>
             <View style={styles.headerTextGroup}>
               <Text style={[styles.cardTitle, { color: colors.text, fontSize: fonts.lg }]}>
@@ -113,54 +162,8 @@ export default function AboutScreen() {
             The Prophet ﷺ said: <Text style={{ fontStyle: 'italic', fontWeight: '600' }}>"The believer to another believer is like a solid building, each part strengthening the other."</Text> (Bukhari & Muslim)
           </Text>
 
-          <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md, marginTop: 8 }]}>
-            Inspired by this profound principle, the <Text style={{ fontWeight: '700' }}>Bunyan Initiative</Text> was formed to build a digital ecosystem that bridges authentic Islamic scholarship with modern technology.
-          </Text>
-
-          {/* Pillars List */}
-          <View style={styles.pillarList}>
-            <View style={styles.pillarRow}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.primary} />
-              <Text style={[styles.pillarText, { color: colors.text }]}>
-                <Text style={{ fontWeight: '700' }}>Structured Curricula:</Text> Organized learning paths across Aqeedah, Tafsir, Hadith, Fiqh, Seerah, and Arabic.
-              </Text>
-            </View>
-
-            <View style={styles.pillarRow}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.primary} />
-              <Text style={[styles.pillarText, { color: colors.text }]}>
-                <Text style={{ fontWeight: '700' }}>Offline-First:</Text> Download lessons as high-quality audio or video to study anywhere without internet dependencies.
-              </Text>
-            </View>
-
-            <View style={styles.pillarRow}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.primary} />
-              <Text style={[styles.pillarText, { color: colors.text }]}>
-                <Text style={{ fontWeight: '700' }}>Smart Resume:</Text> Tracks exact playback positions so you never lose your progress.
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Section 3: Sadaqah Jariyah & Commitment */}
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={styles.cardHeader}>
-            <View style={[styles.iconBox, { backgroundColor: '#BF360C18' }]}>
-              <Ionicons name="sparkles" size={22} color="#BF360C" />
-            </View>
-            <View style={styles.headerTextGroup}>
-              <Text style={[styles.cardTitle, { color: colors.text, fontSize: fonts.lg }]}>
-                100% Free · Sadaqah Jariyah
-              </Text>
-              <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                عِلْمٌ يُنْتَفَعُ بِهِ
-              </Text>
-            </View>
-          </View>
-
-          <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md }]}>
-            This application is non-profit, completely free, and free of any advertisements or trackers.
-            It serves as a perpetual endowment (Waqf) for the sake of Allah.
+          <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md, marginTop: 4 }]}>
+            Bunyan is an independent non-profit initiative created as a perpetual endowment (Waqf) and continuous charity (Sadaqah Jariyah). It is 100% free with zero ads, subscriptions, or paywalls.
           </Text>
 
           <TouchableOpacity
@@ -169,19 +172,19 @@ export default function AboutScreen() {
             activeOpacity={0.8}
           >
             <Ionicons name="share-social-outline" size={18} color="#FFFFFF" />
-            <Text style={styles.shareBtnText}>Share the App & Earn Reward</Text>
+            <Text style={styles.shareBtnText}>Share Bunyan & Earn Sadaqah</Text>
           </TouchableOpacity>
         </View>
 
         {/* Replay Onboarding Button */}
         <TouchableOpacity
-          style={[styles.replayBtn, { borderColor: colors.border }]}
+          style={[styles.replayBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
           onPress={() => router.push('/onboarding')}
           activeOpacity={0.7}
         >
-          <Ionicons name="refresh-outline" size={18} color={colors.textSecondary} />
-          <Text style={[styles.replayBtnText, { color: colors.textSecondary }]}>
-            View Welcome Walkthrough Again
+          <Ionicons name="refresh-outline" size={18} color={colors.primary} />
+          <Text style={[styles.replayBtnText, { color: colors.primary }]}>
+            Open 3-Page Welcome Walkthrough (Sheikhs, Courses, Bunyan)
           </Text>
         </TouchableOpacity>
       </ScrollView>

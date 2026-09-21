@@ -136,7 +136,7 @@ export default function SettingsScreen() {
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <TouchableOpacity style={styles.menuRow} onPress={() => router.push('/about')}>
               <Ionicons name="heart-circle-outline" size={22} color="#1B5E20" />
-              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md }]}>About Bunyan & Dua for the Sheikh</Text>
+              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md }]}>About (Sheikhs, Courses & Bunyan)</Text>
               <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
             </TouchableOpacity>
 
@@ -152,7 +152,7 @@ export default function SettingsScreen() {
 
             <TouchableOpacity style={styles.menuRow} onPress={handleReplayOnboarding}>
               <Ionicons name="refresh-outline" size={22} color={colors.text} />
-              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md }]}>Replay Onboarding</Text>
+              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md }]}>Welcome Walkthrough (3 Pages)</Text>
               <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
             </TouchableOpacity>
 

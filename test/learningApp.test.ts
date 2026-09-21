@@ -100,4 +100,63 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     expect(csv).toContain('Foundations of Aqeedah');
     expect(csv).toContain('Total Registered Learners');
   });
+
+  it('validates exactly 3 welcome pages covering The Sheikhs, The Courses, and Bunyan', async () => {
+    const { welcomeSlides } = await import('../src/data/welcomeData');
+    expect(welcomeSlides.length).toBe(3);
+
+    // Page 1: The Sheikhs
+    const sheikhsSlide = welcomeSlides[0];
+    expect(sheikhsSlide.id).toBe('sheikhs');
+    expect(sheikhsSlide.title).toContain('Sheikhs');
+    expect(sheikhsSlide.badge).toContain('Sheikhs');
+    expect(sheikhsSlide.arabicBadge).toBe('ادْعُوا لِلشَّيْخِ');
+    expect(sheikhsSlide.duaCard).toBeDefined();
+    expect(sheikhsSlide.duaCard?.arabic).toContain('اللَّهُمَّ اغْفِرْ لَهُ');
+    expect(sheikhsSlide.duaCard?.buttonText).toContain('Say Ameen');
+    expect(sheikhsSlide.highlights.length).toBeGreaterThanOrEqual(3);
+
+    // Page 2: The Courses
+    const coursesSlide = welcomeSlides[1];
+    expect(coursesSlide.id).toBe('courses');
+    expect(coursesSlide.title).toContain('Courses');
+    expect(coursesSlide.badge).toContain('Courses');
+    expect(coursesSlide.arabicBadge).toBe('مَنَاهِجُ الدِّرَاسَةِ');
+    expect(coursesSlide.curriculumCategories).toBeDefined();
+    expect(coursesSlide.curriculumCategories?.length).toBeGreaterThanOrEqual(6);
+    const categoryNames = coursesSlide.curriculumCategories?.map(c => c.name);
+    expect(categoryNames).toContain('Aqeedah');
+    expect(categoryNames).toContain('Tafsir');
+    expect(categoryNames).toContain('Hadith');
+    expect(categoryNames).toContain('Fiqh');
+    expect(coursesSlide.highlights.some(h => h.title.includes('Offline'))).toBe(true);
+
+    // Page 3: Bunyan
+    const bunyanSlide = welcomeSlides[2];
+    expect(bunyanSlide.id).toBe('bunyan');
+    expect(bunyanSlide.title).toContain('Bunyan');
+    expect(bunyanSlide.badge).toContain('Bunyan');
+    expect(bunyanSlide.arabicBadge).toBe('مُبَادَرَةُ بُنْيَان');
+    expect(bunyanSlide.pillars).toBeDefined();
+    expect(bunyanSlide.pillars?.length).toBe(3);
+    expect(bunyanSlide.highlights.some(h => h.title.includes('Sadaqah Jariyah'))).toBe(true);
+    expect(bunyanSlide.buttonLabel).toBe('Start Seeking Knowledge');
+  });
+
+  it('manages onboarding completion state in settings store', () => {
+    const settings = useSettingsStore.getState();
+    
+    // Set completed
+    settings.setOnboardingCompleted(true);
+    expect(useSettingsStore.getState().onboardingCompleted).toBe(true);
+
+    // Can be reset to replay onboarding
+    settings.setOnboardingCompleted(false);
+    expect(useSettingsStore.getState().onboardingCompleted).toBe(false);
+
+    // Set back to completed
+    settings.setOnboardingCompleted(true);
+    expect(useSettingsStore.getState().onboardingCompleted).toBe(true);
+  });
 });
+
