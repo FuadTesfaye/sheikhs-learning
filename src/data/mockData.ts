@@ -13,7 +13,17 @@ export const categories: Category[] = [
 ];
 
 export const courses: Course[] = [
-  { id: 'crs-1', categoryId: 'cat-1', title: 'Kitab At-Tawheed: Foundations of Aqeedah', description: 'The comprehensive foundational study of Islamic monotheism (Tawheed), its reality, virtues, and protection against polytheism.', order: 1, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 12, level: 'Beginner' },
+  {
+    id: 'crs-1',
+    categoryId: 'cat-1',
+    title: 'Kitab At-Tawheed: Foundations of Aqeedah',
+    description: 'The comprehensive classical study of Islamic monotheism (Tawheed), its reality, virtues, and protection against polytheism. Features 32 authentic audio lectures from the Sheikh with complete study text.',
+    order: 1,
+    thumbnailUrl: '',
+    instructor: 'Sheikh',
+    totalLessons: 32,
+    level: 'Beginner',
+  },
   { id: 'crs-2', categoryId: 'cat-1', title: 'Advanced Tawheed Studies', description: 'Deep dive into the categories of Tawheed and their implications.', order: 2, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 8, level: 'Advanced' },
   { id: 'crs-3', categoryId: 'cat-2', title: 'Tafsir of Surah Al-Fatiha', description: 'Detailed exegesis of the opening chapter of the Quran.', order: 1, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 6, level: 'Beginner' },
   { id: 'crs-4', categoryId: 'cat-2', title: 'Tafsir of Juz Amma', description: 'Explanation of the 30th part of the Quran, surah by surah.', order: 2, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 15, level: 'Intermediate' },
@@ -24,21 +34,48 @@ export const courses: Course[] = [
   { id: 'crs-9', categoryId: 'cat-7', title: 'Tajweed Fundamentals', description: 'Master the rules of Quran recitation from Noon Sakinah to Madd.', order: 1, thumbnailUrl: '', instructor: 'Sheikh', totalLessons: 8, level: 'Beginner' },
 ];
 
+const tawheedDurations = [
+  3360, 1820, 1940, 2370, 1590, 1560, 1410, 2800, 2880, 1470,
+  3450, 2350, 2550, 3010, 2030, 3720, 3100, 2820, 2110, 3330,
+  3450, 430, 3680, 4240, 2940, 2120, 2650, 3610, 2270, 1440,
+  3400, 2450,
+];
+
 const generateLessons = (courseId: string, count: number, type: 'video' | 'audio' | 'pdf' = 'audio'): Lesson[] => {
   const titles: Record<string, string[]> = {
     'crs-1': [
-      'Introduction to Kitab At-Tawheed',
-      'The Obligation of Tawheed and Its Virtues',
-      'Whoever Purifies Tawheed Enters Paradise without Reckoning',
-      'Fear of Shirk (Associating Partners with Allah)',
-      'The Call to the Testimony of La ilaha illallah',
-      'Explanation of Tawheed and the Shahadah',
-      'Ruqyah, Amulets, and Superstitions',
-      'Seeking Blessings from Trees, Stones, and Relics',
-      'Slaughtering for Other than Allah',
-      'Vows and Seeking Refuge in Other than Allah',
-      'Intercession (Shafa’ah) and Its Categories',
-      'Summary and Review of Foundations',
+      'Lesson 1: Introduction & The Obligation of Tawheed',
+      'Lesson 2: Virtues of Tawheed & Sins it Expiates',
+      'Lesson 3: Realizing Tawheed and Entering Jannah without Reckoning',
+      'Lesson 4: Fear of Falling into Shirk (Polytheism)',
+      'Lesson 5: Calling to the Testimony: La ilaha illallah',
+      'Lesson 6: Explanation of Tawheed and the Shahadah',
+      'Lesson 7: Wearing Rings and Threads to Ward Off Harm',
+      'Lesson 8: Ruqyah (Incantations), Amulets, and Superstitions',
+      'Lesson 9: Seeking Blessings from Trees, Stones, and Relics',
+      'Lesson 10: Slaughtering Sacrifices for Other than Allah',
+      'Lesson 11: Taking Vows for Other than Allah',
+      'Lesson 12: Seeking Refuge in Other than Allah',
+      'Lesson 13: Seeking Deliverance from Other than Allah (Istighathah)',
+      'Lesson 14: Associating Partners with Allah in Worship',
+      'Lesson 15: The Angels Trembling at the Speech of Allah',
+      'Lesson 16: Intercession (Shafa’ah) and Its Conditions',
+      'Lesson 17: Guidance Belongs to Allah Alone',
+      'Lesson 18: Exaggeration Regarding the Pious Leading to Disbelief',
+      'Lesson 19: Severe Warning against Worshipping Allah at Graves',
+      'Lesson 20: Extremism with the Graves of Righteous Men',
+      'Lesson 21: Protecting Tawheed: Closing the Avenues to Shirk',
+      'Lesson 22: Sorcery and Magic (Sihr) and Its Rulings',
+      'Lesson 23: Types and Categorization of Magic',
+      'Lesson 24: Diviners, Astrologers, and Soothsayers',
+      'Lesson 25: Evil Omens and Superstitions (Tiyarah)',
+      'Lesson 26: Astrology (Tanjeem) and the Influence of Stars',
+      'Lesson 27: Seeking Rain through Constellations (Istisqa)',
+      'Lesson 28: Sincere Love for Allah Alone',
+      'Lesson 29: Pure Fear of Allah Alone',
+      'Lesson 30: Sincere Trust and Reliance on Allah (Tawakkul)',
+      'Lesson 31: Feeling Secure from Allah’s Plan and Despair of Mercy',
+      'Lesson 32: Patience with the Decrees of Allah (Sabr ala Qadarillah)',
     ],
     'crs-3': [
       'Introduction to Al-Fatiha',
@@ -64,37 +101,44 @@ const generateLessons = (courseId: string, count: number, type: 'video' | 'audio
 
   return Array.from({ length: count }, (_, i) => {
     const lessonNum = String(i + 1).padStart(2, '0');
-    // Real Cloudflare R2 audio & pdf for Kitab At-Tawheed
     const isTawheed = courseId === 'crs-1';
+
+    // Real Cloudflare R2 audio & pdf for Kitab At-Tawheed
     const audioUrl = isTawheed
       ? getR2Url(`kitabu-tawhid/lesson-${lessonNum}.mp3`)
       : `https://example.com/media/${courseId}/lesson-${i + 1}.mp3`;
+
+    // Real Cloudflare R2 PDF study text for Kitab At-Tawheed
     const pdfUrl = isTawheed && i === 0
       ? getR2Url('kitabu-tawhid/lesson-01.pdf')
       : (i % 5 === 4 ? `https://example.com/media/${courseId}/lesson-${i + 1}.pdf` : undefined);
+
+    const calculatedDuration = isTawheed
+      ? (tawheedDurations[i] || 1800)
+      : (1200 + Math.floor(Math.random() * 1800));
 
     return {
       id: `${courseId}-les-${i + 1}`,
       courseId,
       title: titles[courseId]?.[i] || `Lesson ${i + 1}`,
       description: isTawheed
-        ? `Comprehensive explanation of Kitab At-Tawheed lesson ${i + 1} with authentic audio from the Sheikh.`
+        ? `Comprehensive explanation of Kitab At-Tawheed Chapter ${i + 1} with authentic audio from the Sheikh.`
         : `Part ${i + 1} of the course series.`,
-      duration: isTawheed ? (i === 0 ? 3360 : 1800 + (i * 120)) : (1200 + Math.floor(Math.random() * 1800)),
+      duration: calculatedDuration,
       order: i + 1,
       type: isTawheed ? 'audio' : (i % 5 === 4 ? 'pdf' : (i % 3 === 2 ? 'audio' : type)),
       mediaUrl: audioUrl,
       audioOnlyUrl: audioUrl,
       pdfUrl,
       transcriptText: isTawheed
-        ? 'Full transcription and study notes for Kitab At-Tawheed.'
+        ? 'Full classical study notes and textbook references for Kitab At-Tawheed.'
         : 'Transcript content will appear here when available.',
     };
   });
 };
 
 export const lessons: Lesson[] = [
-  ...generateLessons('crs-1', 12),
+  ...generateLessons('crs-1', 32),
   ...generateLessons('crs-2', 8),
   ...generateLessons('crs-3', 6),
   ...generateLessons('crs-4', 15),

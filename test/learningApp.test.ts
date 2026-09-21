@@ -190,6 +190,30 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
       expect(pdfDl).toBeDefined();
     }
   });
+
+  it('validates complete 32-lesson curriculum path for Kitab At-Tawheed', () => {
+    const tawheedLessons = getLessonsByCourse('crs-1');
+    expect(tawheedLessons.length).toBe(32);
+
+    tawheedLessons.forEach((lesson, index) => {
+      const lessonNum = String(index + 1).padStart(2, '0');
+      expect(lesson.audioOnlyUrl).toContain(`kitabu-tawhid/lesson-${lessonNum}.mp3`);
+      expect(lesson.duration).toBeGreaterThan(0);
+      expect(lesson.title).toContain(`Lesson ${index + 1}:`);
+    });
+
+    // Lesson 1 must have the PDF study text
+    expect(tawheedLessons[0].pdfUrl).toContain('kitabu-tawhid/lesson-01.pdf');
+  });
+
+  it('verifies audio player hook and pdf viewer export availability', async () => {
+    const { useAudioPlayer } = await import('../src/hooks');
+    expect(typeof useAudioPlayer).toBe('function');
+
+    const { PdfViewer } = await import('../src/components');
+    expect(PdfViewer).toBeDefined();
+  });
 });
+
 
 

@@ -39,8 +39,27 @@ mock.module('react-native', () => {
       create: (obj: any) => obj,
     },
     useColorScheme: () => 'light',
+    TurboModuleRegistry: {
+      get: () => null,
+      getEnforcing: () => ({}),
+    },
+    Linking: {
+      openURL: async () => true,
+      canOpenURL: async () => true,
+    },
+    View: (props: any) => props.children || null,
+    Text: (props: any) => props.children || null,
+    TouchableOpacity: (props: any) => props.children || null,
   };
 });
+
+// Mock @expo/vector-icons
+mock.module('@expo/vector-icons', () => ({
+  Ionicons: () => null,
+  MaterialIcons: () => null,
+  FontAwesome: () => null,
+}));
+
 
 const fileSystemMock = {
   documentDirectory: 'file:///data/user/0/com.sheikh.learning/files/',
@@ -55,5 +74,32 @@ const fileSystemMock = {
 
 mock.module('expo-file-system', () => fileSystemMock);
 mock.module('expo-file-system/legacy', () => fileSystemMock);
+
+// Mock expo-av
+mock.module('expo-av', () => ({
+  Audio: {
+    Sound: {
+      createAsync: async () => ({
+        sound: {
+          playAsync: async () => {},
+          pauseAsync: async () => {},
+          setPositionAsync: async () => {},
+          setRateAsync: async () => {},
+          unloadAsync: async () => {},
+          getStatusAsync: async () => ({ isLoaded: true, isPlaying: false }),
+        },
+        status: { isLoaded: true, durationMillis: 1800000 },
+      }),
+    },
+    setAudioModeAsync: async () => {},
+  },
+}));
+
+// Mock expo-linking
+mock.module('expo-linking', () => ({
+  openURL: async () => true,
+  canOpenURL: async () => true,
+}));
+
 
 
