@@ -108,8 +108,8 @@ const generateLessons = (courseId: string, count: number, type: 'video' | 'audio
       ? getR2Url(`kitabu-tawhid/lesson-${lessonNum}.mp3`)
       : `https://example.com/media/${courseId}/lesson-${i + 1}.mp3`;
 
-    // Real Cloudflare R2 PDF study text for Kitab At-Tawheed
-    const pdfUrl = isTawheed && i === 0
+    // Real Cloudflare R2 PDF study text for Kitab At-Tawheed (available across all lessons)
+    const pdfUrl = isTawheed
       ? getR2Url('kitabu-tawhid/lesson-01.pdf')
       : (i % 5 === 4 ? `https://example.com/media/${courseId}/lesson-${i + 1}.pdf` : undefined);
 

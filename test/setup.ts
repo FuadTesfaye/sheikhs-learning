@@ -50,6 +50,8 @@ mock.module('react-native', () => {
     View: (props: any) => props.children || null,
     Text: (props: any) => props.children || null,
     TouchableOpacity: (props: any) => props.children || null,
+    ScrollView: (props: any) => props.children || null,
+    ActivityIndicator: () => null,
   };
 });
 

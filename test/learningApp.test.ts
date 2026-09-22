@@ -202,8 +202,10 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
       expect(lesson.title).toContain(`Lesson ${index + 1}:`);
     });
 
-    // Lesson 1 must have the PDF study text
-    expect(tawheedLessons[0].pdfUrl).toContain('kitabu-tawhid/lesson-01.pdf');
+    // ALL 32 Kitab At-Tawheed lessons must have the PDF study text openable by default
+    tawheedLessons.forEach((lesson) => {
+      expect(lesson.pdfUrl).toContain('kitabu-tawhid/lesson-01.pdf');
+    });
   });
 
   it('verifies audio player hook and pdf viewer export availability', async () => {
