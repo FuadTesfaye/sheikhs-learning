@@ -5,4 +5,5 @@ export { ContinueLearningCard } from './ContinueLearningCard';
 export { ProgressBar } from './ProgressBar';
 export { EmptyState } from './EmptyState';
 export { PdfViewer } from './PdfViewer';
-
+export { SeekableProgressBar } from './SeekableProgressBar';
+export { KitabCover } from './KitabCover';

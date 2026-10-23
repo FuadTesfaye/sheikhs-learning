@@ -15,7 +15,7 @@ import { useTheme, useScaledFont, useAudioPlayer } from '../../src/hooks';
 import { getLessonById, getCourseById, getLessonsByCourse } from '../../src/data/mockData';
 import { useLearningStore, useDownloadStore } from '../../src/store';
 import { DownloadService } from '../../src/services/downloadService';
-import { PdfViewer } from '../../src/components';
+import { PdfViewer, SeekableProgressBar } from '../../src/components';
 import { Spacing, BorderRadius } from '../../src/theme';
 
 function formatTime(seconds: number): string {
@@ -251,7 +251,8 @@ export default function LessonScreen() {
         {hasPdf && activeTab === 'pdf' && lesson.pdfUrl && (
           <PdfViewer
             pdfUrl={lesson.pdfUrl}
-            title={lesson.title}
+            localFileUri={pdfDownload?.fileUri}
+            title={course?.title ? `${course.title} - ${lesson.title}` : lesson.title}
             isDownloaded={isPdfDownloaded}
             isDownloading={isPdfDownloading}
             onDownload={handleDownloadPdf}
@@ -387,21 +388,13 @@ export default function LessonScreen() {
         ]}
       >
         {/* Scrubber Progress Bar */}
-        <TouchableOpacity
-          style={styles.scrubberContainer}
-          activeOpacity={0.9}
-          onPress={(e) => {
-            const { locationX } = e.nativeEvent;
-            // Approximate seek ratio across average container width
-            const seekRatio = Math.max(0, Math.min(1, locationX / 340));
-            seekTo(seekRatio * duration);
-          }}
-        >
-          <View style={[styles.scrubberTrack, { backgroundColor: colors.progressTrack }]}>
-            <View style={[styles.scrubberFill, { backgroundColor: colors.primary, width: `${progressPercent}%` }]} />
-            <View style={[styles.scrubberKnob, { backgroundColor: colors.primary, left: `${Math.min(98, progressPercent)}%` }]} />
-          </View>
-        </TouchableOpacity>
+        <View style={styles.scrubberContainer}>
+          <SeekableProgressBar
+            currentTime={currentTime}
+            duration={duration}
+            onSeek={seekTo}
+          />
+        </View>
 
         {/* Player Bar Content */}
         <View style={styles.playerInner}>

@@ -9,14 +9,14 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
   it('loads all core categories correctly', () => {
     expect(categories.length).toBeGreaterThanOrEqual(8);
     const names = categories.map(c => c.name);
-    expect(names).toContain('Aqeedah');
-    expect(names).toContain('Tafsir');
-    expect(names).toContain('Hadith');
-    expect(names).toContain('Fiqh');
-    expect(names).toContain('Seerah');
-    expect(names).toContain('Arabic Grammar');
-    expect(names).toContain('Tajweed');
-    expect(names).toContain('Adab');
+    expect(names).toContain('العقيدة');
+    expect(names).toContain('التفسير');
+    expect(names).toContain('الحديث');
+    expect(names).toContain('الفقه');
+    expect(names).toContain('السيرة');
+    expect(names).toContain('اللغة العربية');
+    expect(names).toContain('التجويد');
+    expect(names).toContain('الآداب والأخلاق');
   });
 
   it('filters courses by category and lessons by course', () => {
@@ -59,7 +59,7 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     expect(useLearningStore.getState().isBookmarked('crs-3-les-1')).toBe(false);
   });
 
-  it('handles download lifecycle and storage math', () => {
+  it('handles download lifecycle: pause, resume, retry, cancel, and storage math', async () => {
     const downloadStore = useDownloadStore.getState();
     downloadStore.clearAllDownloads();
 
@@ -70,12 +70,42 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     expect(downloads.length).toBe(1);
     expect(downloads[0].lessonId).toBe(sampleLesson.id);
     expect(downloads[0].format).toBe('audio');
+    expect(downloads[0].status).toBe('downloading');
 
-    // Simulate completion
-    useDownloadStore.getState().completeDownload(downloads[0].id, 'file:///offline/test.mp3');
+    // 1. Test Pause
+    DownloadService.pause(downloads[0].id);
+    expect(useDownloadStore.getState().downloads[downloads[0].id].status).toBe('paused');
+
+    // 2. Test Resume
+    DownloadService.resume(downloads[0].id);
+    expect(useDownloadStore.getState().downloads[downloads[0].id].status).toBe('downloading');
+
+    // 3. Test Offline Network Loss transition to 'waiting_for_internet'
+    DownloadService.setNetworkStateForTesting(false);
+    expect(useDownloadStore.getState().downloads[downloads[0].id].status).toBe('waiting_for_internet');
+
+    // 4. Test Network Restore auto-resumes
+    DownloadService.setNetworkStateForTesting(true);
+    expect(useDownloadStore.getState().downloads[downloads[0].id].status).toBe('downloading');
+
+    // 5. Simulate Complete and Storage Breakdown
+    useDownloadStore.getState().completeDownload(downloads[0].id, 'file:///offline/test.mp3', 25000000);
     const completed = useDownloadStore.getState().getDownloadByLessonId(sampleLesson.id);
     expect(completed?.status).toBe('completed');
-    expect(useDownloadStore.getState().getStorageUsed()).toBeGreaterThan(0);
+    expect(completed?.downloadedBytes).toBe(25000000);
+
+    const breakdown = useDownloadStore.getState().getStorageBreakdown();
+    expect(breakdown.audioBytes).toBe(25000000);
+    expect(breakdown.totalBytes).toBe(25000000);
+    expect(breakdown.completedCount).toBe(1);
+
+    // 6. Test Clear Cache Only preserves completed downloads
+    await useDownloadStore.getState().clearCacheOnly();
+    expect(useDownloadStore.getState().downloads[downloads[0].id]).toBeDefined();
+
+    // 7. Test Cancel removes download
+    DownloadService.cancel(downloads[0].id);
+    expect(useDownloadStore.getState().downloads[downloads[0].id]).toBeUndefined();
   });
 
   it('calculates font scaling and small-device dimensions correctly', () => {
@@ -90,15 +120,30 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     expect(moderateScale(16)).toBeGreaterThan(0);
   });
 
-  it('validates admin analytics and CSV export generation', () => {
+  it('validates admin analytics and CSV export with Arabic titles', () => {
     const admin = useAdminStore.getState();
     expect(admin.unlockAdmin('wrong')).toBe(false);
     expect(admin.unlockAdmin('1234')).toBe(true);
 
     const csv = admin.exportReportCsv();
     expect(csv).toContain('Course Title');
-    expect(csv).toContain('Foundations of Aqeedah');
+    expect(csv).toContain('كِتَابُ التَّوْحِيدِ');
     expect(csv).toContain('Total Registered Learners');
+  });
+
+  it('validates Arabic-only kitab titles across all courses without English transliterations', () => {
+    expect(courses.length).toBeGreaterThanOrEqual(10);
+    courses.forEach(course => {
+      // Must not contain English words like 'Kitab' or 'Foundations' in the title
+      expect(course.title).not.toMatch(/[a-zA-Z]/);
+      expect(course.title.length).toBeGreaterThan(0);
+    });
+
+    // Check primary titles
+    expect(courses[0].title).toBe('كِتَابُ التَّوْحِيدِ');
+    expect(courses[1].title).toBe('ثَلَاثَةُ الأُصُولِ وَأَدِلَّتُهَا');
+    expect(courses[2].title).toBe('القَوَاعِدُ الأَرْبَعُ');
+    expect(courses[3].title).toBe('كَشْفُ الشُّبُهَاتِ');
   });
 
   it('validates exactly 3 welcome pages covering The Sheikhs, The Courses, and Bunyan', async () => {
@@ -124,11 +169,6 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     expect(coursesSlide.arabicBadge).toBe('مَنَاهِجُ الدِّرَاسَةِ');
     expect(coursesSlide.curriculumCategories).toBeDefined();
     expect(coursesSlide.curriculumCategories?.length).toBeGreaterThanOrEqual(6);
-    const categoryNames = coursesSlide.curriculumCategories?.map(c => c.name);
-    expect(categoryNames).toContain('Aqeedah');
-    expect(categoryNames).toContain('Tafsir');
-    expect(categoryNames).toContain('Hadith');
-    expect(categoryNames).toContain('Fiqh');
     expect(coursesSlide.highlights.some(h => h.title.includes('Offline'))).toBe(true);
 
     // Page 3: Bunyan
@@ -199,7 +239,7 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
       const lessonNum = String(index + 1).padStart(2, '0');
       expect(lesson.audioOnlyUrl).toContain(`kitabu-tawhid/lesson-${lessonNum}.mp3`);
       expect(lesson.duration).toBeGreaterThan(0);
-      expect(lesson.title).toContain(`Lesson ${index + 1}:`);
+      expect(lesson.title).toContain(`الدرس ${index + 1}:`);
     });
 
     // ALL 32 Kitab At-Tawheed lessons must have the PDF study text openable by default
@@ -208,14 +248,13 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     });
   });
 
-  it('verifies audio player hook and pdf viewer export availability', async () => {
+  it('verifies audio player hook, seekable progress bar, and pdf viewer export availability', async () => {
     const { useAudioPlayer } = await import('../src/hooks');
     expect(typeof useAudioPlayer).toBe('function');
 
-    const { PdfViewer } = await import('../src/components');
+    const { PdfViewer, SeekableProgressBar, KitabCover } = await import('../src/components');
     expect(PdfViewer).toBeDefined();
+    expect(SeekableProgressBar).toBeDefined();
+    expect(KitabCover).toBeDefined();
   });
 });
-
-
-

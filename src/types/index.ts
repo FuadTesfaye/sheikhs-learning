@@ -1,6 +1,12 @@
 export type LessonType = 'video' | 'audio' | 'pdf';
 export type LessonStatus = 'not_started' | 'in_progress' | 'completed';
-export type DownloadStatus = 'pending' | 'downloading' | 'completed' | 'paused' | 'failed';
+export type DownloadStatus =
+  | 'pending'
+  | 'downloading'
+  | 'paused'
+  | 'waiting_for_internet'
+  | 'completed'
+  | 'failed';
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TextSize = 'small' | 'medium' | 'large';
 
@@ -21,9 +27,12 @@ export interface Course {
   description: string;
   order: number;
   thumbnailUrl: string;
+  coverUrl?: any;
   instructor: string;
   totalLessons: number;
   level: 'Beginner' | 'Intermediate' | 'Advanced';
+  isAvailable?: boolean;
+  statusLabel?: string;
 }
 
 export interface Lesson {
@@ -39,6 +48,7 @@ export interface Lesson {
   pdfUrl?: string;
   transcriptText?: string;
   thumbnailUrl?: string;
+  isAvailable?: boolean;
 }
 
 export interface LessonProgress {
@@ -59,9 +69,14 @@ export interface DownloadItem {
   format: LessonType;
   fileUri: string;
   fileSize: number;
+  downloadedBytes: number;
   progress: number;
   status: DownloadStatus;
   downloadedAt?: string;
+  resumeData?: string;
+  error?: string;
+  retryCount?: number;
+  targetUrl?: string;
 }
 
 export interface Bookmark {

@@ -5,6 +5,7 @@ import { Course } from '../types';
 import { useTheme, useScaledFont } from '../hooks';
 import { useLearningStore } from '../store';
 import { Spacing, BorderRadius } from '../theme';
+import { KitabCover } from './KitabCover';
 
 interface Props {
   course: Course;
@@ -12,9 +13,15 @@ interface Props {
 }
 
 const LEVEL_COLORS = {
-  Beginner: '#4CAF50',
-  Intermediate: '#FF9800',
-  Advanced: '#F44336',
+  Beginner: '#2E7D32',
+  Intermediate: '#E65100',
+  Advanced: '#C62828',
+};
+
+const LEVEL_ARABIC = {
+  Beginner: 'مبتدئ',
+  Intermediate: 'متوسط',
+  Advanced: 'متقدم',
 };
 
 export const CourseCard = memo(({ course, onPress }: Props) => {
@@ -36,47 +43,80 @@ export const CourseCard = memo(({ course, onPress }: Props) => {
     <TouchableOpacity
       style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
       onPress={() => onPress(course)}
-      activeOpacity={0.7}
+      activeOpacity={0.75}
+      accessibilityLabel={`فتح ${course.title}`}
     >
-      <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Text style={[styles.title, { color: colors.text, fontSize: fonts.lg }]} numberOfLines={2}>
+      <View style={styles.contentRow}>
+        {/* Authentic Kitab Book Cover */}
+        <View style={styles.coverWrapper}>
+          <KitabCover
+            coverUrl={course.coverUrl || course.thumbnailUrl}
+            arabicTitle={course.title}
+            author={course.instructor}
+            width={84}
+            height={112}
+            variant="card"
+          />
+        </View>
+
+        {/* Book Details */}
+        <View style={styles.detailsContainer}>
+          <View style={styles.topRow}>
+            <View style={[styles.levelBadge, { backgroundColor: LEVEL_COLORS[course.level] + '18' }]}>
+              <Text style={[styles.levelText, { color: LEVEL_COLORS[course.level], fontSize: fonts.xs }]}>
+                {LEVEL_ARABIC[course.level] || course.level}
+              </Text>
+            </View>
+            <View style={styles.lessonsCountBadge}>
+              <Ionicons name="play-circle-outline" size={13} color={colors.textSecondary} />
+              <Text style={[styles.lessonsCountText, { color: colors.textSecondary, fontSize: fonts.xs }]}>
+                {course.totalLessons} {course.totalLessons <= 10 ? 'دروس' : 'درساً'}
+              </Text>
+            </View>
+          </View>
+
+          {/* Arabic-Only Book Title */}
+          <Text
+            style={[styles.title, { color: colors.text, fontSize: fonts.lg }]}
+            numberOfLines={2}
+          >
             {course.title}
           </Text>
-          <Text style={[styles.description, { color: colors.textSecondary, fontSize: fonts.sm }]} numberOfLines={2}>
+
+          {/* Description */}
+          <Text
+            style={[styles.description, { color: colors.textSecondary, fontSize: fonts.xs }]}
+            numberOfLines={2}
+          >
             {course.description}
           </Text>
-        </View>
-        <View style={[styles.levelBadge, { backgroundColor: LEVEL_COLORS[course.level] + '20' }]}>
-          <Text style={[styles.levelText, { color: LEVEL_COLORS[course.level], fontSize: fonts.xs }]}>
-            {course.level}
-          </Text>
-        </View>
-      </View>
 
-      <View style={styles.footer}>
-        <View style={styles.lessonsInfo}>
-          <Ionicons name="play-circle-outline" size={16} color={colors.textSecondary} />
-          <Text style={[styles.lessonsText, { color: colors.textSecondary, fontSize: fonts.sm }]}>
-            {course.totalLessons} lessons
-          </Text>
-        </View>
-
-        {percentage > 0 && (
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, { backgroundColor: colors.progressTrack }]}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { backgroundColor: colors.progressFill, width: `${percentage}%` },
-                ]}
-              />
-            </View>
-            <Text style={[styles.progressText, { color: colors.primaryLight, fontSize: fonts.xs }]}>
-              {percentage}%
-            </Text>
+          {/* Footer Progress & Status */}
+          <View style={styles.cardFooter}>
+            {percentage > 0 ? (
+              <View style={styles.progressContainer}>
+                <View style={[styles.progressBar, { backgroundColor: colors.progressTrack }]}>
+                  <View
+                    style={[
+                      styles.progressFill,
+                      { backgroundColor: colors.progressFill, width: `${percentage}%` },
+                    ]}
+                  />
+                </View>
+                <Text style={[styles.progressText, { color: colors.primary, fontSize: fonts.xs }]}>
+                  {percentage}%
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.instructorRow}>
+                <Ionicons name="person-outline" size={12} color={colors.textTertiary} />
+                <Text style={[styles.instructorText, { color: colors.textTertiary, fontSize: fonts.xs }]} numberOfLines={1}>
+                  {course.instructor}
+                </Text>
+              </View>
+            )}
           </View>
-        )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -84,57 +124,79 @@ export const CourseCard = memo(({ course, onPress }: Props) => {
 
 const styles = StyleSheet.create({
   card: {
-    padding: Spacing.lg,
+    padding: Spacing.md,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     marginBottom: Spacing.md,
+    overflow: 'hidden',
   },
-  header: {
+  contentRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.md,
+    alignItems: 'center',
+    gap: Spacing.md,
   },
-  titleContainer: {
+  coverWrapper: {
+    alignSelf: 'center',
+  },
+  detailsContainer: {
     flex: 1,
-    marginRight: Spacing.sm,
+    justifyContent: 'space-between',
+    minHeight: 112,
   },
-  title: {
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  description: {
-    lineHeight: 18,
-  },
-  levelBadge: {
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 4,
-    borderRadius: BorderRadius.sm,
-    alignSelf: 'flex-start',
-  },
-  levelText: {
-    fontWeight: '600',
-  },
-  footer: {
+  topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 4,
   },
-  lessonsInfo: {
+  levelBadge: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.sm,
+  },
+  levelText: {
+    fontWeight: '700',
+  },
+  lessonsCountBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  lessonsCountText: {
+    fontWeight: '500',
+  },
+  title: {
+    fontWeight: '800',
+    marginBottom: 4,
+    lineHeight: 22,
+    writingDirection: 'rtl',
+    textAlign: 'left',
+  },
+  description: {
+    lineHeight: 16,
+    writingDirection: 'rtl',
+    textAlign: 'left',
+    marginBottom: 6,
+  },
+  cardFooter: {
+    marginTop: 'auto',
+  },
+  instructorRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  lessonsText: {},
+  instructorText: {
+    fontWeight: '500',
+  },
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    flex: 1,
-    marginLeft: Spacing.lg,
+    gap: 6,
   },
   progressBar: {
     flex: 1,
-    height: 6,
+    height: 5,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -143,8 +205,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   progressText: {
-    fontWeight: '600',
-    minWidth: 32,
-    textAlign: 'right',
+    fontWeight: '700',
+    minWidth: 28,
   },
 });

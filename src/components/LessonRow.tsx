@@ -122,8 +122,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 4,
+    writingDirection: 'rtl',
+    textAlign: 'left',
   },
   meta: {
     flexDirection: 'row',

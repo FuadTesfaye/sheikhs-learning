@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -7,6 +7,14 @@ import { useTheme, useScaledFont } from '../../src/hooks';
 import { useSettingsStore, useLearningStore, useDownloadStore } from '../../src/store';
 import { Spacing, BorderRadius } from '../../src/theme';
 import { ThemeMode, TextSize } from '../../src/types';
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
 
 export default function SettingsScreen() {
   const { colors, isDark } = useTheme();
@@ -19,6 +27,30 @@ export default function SettingsScreen() {
   const setOnboardingCompleted = useSettingsStore(s => s.setOnboardingCompleted);
   const clearLearning = useLearningStore(s => s.clearAll);
   const clearDownloads = useDownloadStore(s => s.clearAllDownloads);
+  const clearCacheOnly = useDownloadStore(s => s.clearCacheOnly);
+  const rawDownloads = useDownloadStore(s => s.downloads);
+
+  const storageBreakdown = useMemo(() => {
+    const completed = Object.values(rawDownloads).filter(d => d.status === 'completed');
+    let audioBytes = 0;
+    let pdfBytes = 0;
+
+    completed.forEach(item => {
+      const size = item.fileSize || item.downloadedBytes || 0;
+      if (item.format === 'audio') {
+        audioBytes += size;
+      } else if (item.format === 'pdf') {
+        pdfBytes += size;
+      }
+    });
+
+    return {
+      audioBytes,
+      pdfBytes,
+      totalBytes: audioBytes + pdfBytes,
+      completedCount: completed.length,
+    };
+  }, [rawDownloads]);
 
   const themes: { label: string; value: ThemeMode }[] = [
     { label: 'Light', value: 'light' },
@@ -31,6 +63,11 @@ export default function SettingsScreen() {
     { label: 'Medium', value: 'medium' },
     { label: 'Large', value: 'large' },
   ];
+
+  const handleClearCache = async () => {
+    await clearCacheOnly();
+    Alert.alert('تم مسح الذاكرة المؤقتة', 'تم تفريغ الملفات المؤقتة بنجاح مع الحفاظ الكامل على كتبك ودروسك المحفوظة دون اتصال.');
+  };
 
   const handleClearData = () => {
     Alert.alert(
@@ -127,6 +164,46 @@ export default function SettingsScreen() {
             <Text style={[styles.previewText, { color: colors.textSecondary, fontSize: fonts.md }]}>
               This is a preview of the current text size. Adjust to your preference.
             </Text>
+          </View>
+        </View>
+
+        {/* Storage & Cache Management */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm }]}>STORAGE & CACHE (إدارة المساحة والذاكرة)</Text>
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.aboutRow}>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>الدروس الصوتية المحفوظة (Audio)</Text>
+              <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>
+                {formatBytes(storageBreakdown.audioBytes)}
+              </Text>
+            </View>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View style={styles.aboutRow}>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>الكتب ومتون الدراسة (PDF)</Text>
+              <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>
+                {formatBytes(storageBreakdown.pdfBytes)}
+              </Text>
+            </View>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View style={styles.aboutRow}>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm, fontWeight: '700' }]}>إجمالي المساحة المستخدمة</Text>
+              <Text style={[styles.aboutValue, { color: colors.primary, fontSize: fonts.sm, fontWeight: '700' }]}>
+                {formatBytes(storageBreakdown.totalBytes)} ({storageBreakdown.completedCount} ملفات)
+              </Text>
+            </View>
+
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+            <TouchableOpacity
+              style={[styles.storageActionBtn, { backgroundColor: colors.surfaceVariant, borderColor: colors.border }]}
+              onPress={handleClearCache}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="sparkles-outline" size={18} color={colors.primary} />
+              <Text style={[styles.storageActionText, { color: colors.text, fontSize: fonts.sm }]}>
+                تنظيف الذاكرة المؤقتة (Clear Temp Cache)
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -249,4 +326,17 @@ const styles = StyleSheet.create({
   },
   aboutLabel: {},
   aboutValue: { fontWeight: '500' },
+  storageActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    gap: 8,
+    marginTop: Spacing.xs,
+  },
+  storageActionText: {
+    fontWeight: '600',
+  },
 });

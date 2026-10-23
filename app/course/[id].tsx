@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme, useScaledFont } from '../../src/hooks';
 import { getCourseById, getLessonsByCourse } from '../../src/data/mockData';
 import { useLearningStore, useDownloadStore } from '../../src/store';
-import { LessonRow, ProgressBar, EmptyState } from '../../src/components';
+import { LessonRow, ProgressBar, EmptyState, KitabCover } from '../../src/components';
 import { Spacing, BorderRadius } from '../../src/theme';
 import { Lesson } from '../../src/types';
 import { DownloadService } from '../../src/services/downloadService';
@@ -35,6 +35,10 @@ export default function CourseScreen() {
     };
   }, [id, progress, course?.totalLessons]);
 
+  const downloadableLessons = useMemo(() => {
+    return lessons.filter(l => Boolean(l.mediaUrl || l.audioOnlyUrl || l.pdfUrl));
+  }, [lessons]);
+
   const handleLessonPress = useCallback((lesson: Lesson) => {
     router.push(`/lesson/${lesson.id}`);
   }, []);
@@ -44,16 +48,21 @@ export default function CourseScreen() {
   }, []);
 
   const handleDownloadAll = () => {
+    if (downloadableLessons.length === 0) {
+      Alert.alert('تنبيه', 'التسجيلات الصوتية لهذا المتن قيد التسجيل والإعداد حالياً، وسيتم إتاحتها قريباً بإذن الله.');
+      return;
+    }
+
     Alert.alert(
-      'Download All',
-      `Download all ${lessons.length} lessons for offline access?`,
+      'تحميل جميع الدروس',
+      `هل ترغب في تحميل ${downloadableLessons.length} درساً للاستماع دون اتصال؟`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Download',
+          text: 'تحميل الكل',
           onPress: () => {
-            DownloadService.downloadCourse(lessons);
-            Alert.alert('Downloads Started', `${lessons.length} lessons are now downloading. You can track progress in the Downloads tab.`);
+            DownloadService.downloadCourse(downloadableLessons);
+            Alert.alert('بدأ التحميل', `جاري تحميل ${downloadableLessons.length} درساً في الخلفية. يمكنك متابعة التقدم في تبويب التحميلات.`);
           },
         },
       ]
@@ -63,7 +72,7 @@ export default function CourseScreen() {
   if (!course) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <EmptyState icon="alert-circle-outline" title="Course Not Found" subtitle="This course may have been removed." />
+        <EmptyState icon="alert-circle-outline" title="الكتاب غير موجود" subtitle="ربما تم نقل هذا الكتاب أو تعديل مساره." />
       </View>
     );
   }
@@ -95,27 +104,46 @@ export default function CourseScreen() {
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.headerSection}>
-            <Text style={[styles.courseTitle, { color: colors.text, fontSize: fonts.xxl }]}>
-              {course.title}
-            </Text>
+            {/* Authentic Kitab Hero Header */}
+            <View style={styles.heroRow}>
+              <KitabCover
+                coverUrl={course.coverUrl || course.thumbnailUrl}
+                arabicTitle={course.title}
+                author={course.instructor}
+                width={110}
+                height={150}
+                variant="detail"
+              />
+              <View style={styles.heroInfo}>
+                <Text style={[styles.courseTitle, { color: colors.text, fontSize: fonts.xxl }]}>
+                  {course.title}
+                </Text>
+                <View style={styles.authorBadgeRow}>
+                  <Ionicons name="person" size={13} color={colors.primary} />
+                  <Text style={[styles.instructorText, { color: colors.primary, fontSize: fonts.sm }]}>
+                    {course.instructor}
+                  </Text>
+                </View>
+                <View style={styles.metaRow}>
+                  <View style={[styles.metaBadge, { backgroundColor: colors.surfaceVariant }]}>
+                    <Ionicons name="school-outline" size={13} color={colors.textSecondary} />
+                    <Text style={[styles.metaText, { color: colors.textSecondary, fontSize: fonts.xs }]}>
+                      {course.level === 'Beginner' ? 'مبتدئ' : course.level === 'Intermediate' ? 'متوسط' : 'متقدم'}
+                    </Text>
+                  </View>
+                  <View style={[styles.metaBadge, { backgroundColor: colors.surfaceVariant }]}>
+                    <Ionicons name="play-circle-outline" size={13} color={colors.textSecondary} />
+                    <Text style={[styles.metaText, { color: colors.textSecondary, fontSize: fonts.xs }]}>
+                      {course.totalLessons} {course.totalLessons <= 10 ? 'دروس' : 'درساً'}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
             <Text style={[styles.courseDesc, { color: colors.textSecondary, fontSize: fonts.md }]}>
               {course.description}
             </Text>
-
-            <View style={styles.metaRow}>
-              <View style={[styles.metaBadge, { backgroundColor: colors.surfaceVariant }]}>
-                <Ionicons name="school-outline" size={14} color={colors.textSecondary} />
-                <Text style={[styles.metaText, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                  {course.level}
-                </Text>
-              </View>
-              <View style={[styles.metaBadge, { backgroundColor: colors.surfaceVariant }]}>
-                <Ionicons name="play-circle-outline" size={14} color={colors.textSecondary} />
-                <Text style={[styles.metaText, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                  {course.totalLessons} lessons
-                </Text>
-              </View>
-            </View>
 
             <ProgressBar
               percentage={courseProgress.percentage}
@@ -123,21 +151,31 @@ export default function CourseScreen() {
               total={course.totalLessons}
             />
 
-            <TouchableOpacity
-              style={[styles.downloadAllBtn, { backgroundColor: colors.primary }]}
-              onPress={handleDownloadAll}
-            >
-              <Ionicons name="cloud-download-outline" size={20} color="#fff" />
-              <Text style={styles.downloadAllText}>Download All Lessons</Text>
-            </TouchableOpacity>
+            {downloadableLessons.length > 0 ? (
+              <TouchableOpacity
+                style={[styles.downloadAllBtn, { backgroundColor: colors.primary }]}
+                onPress={handleDownloadAll}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="cloud-download-outline" size={20} color="#fff" />
+                <Text style={styles.downloadAllText}>تحميل جميع الدروس المتاحة</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={[styles.prepNoticeBox, { backgroundColor: colors.primaryLight + '12', borderColor: colors.primaryLight + '30' }]}>
+                <Ionicons name="information-circle-outline" size={18} color={colors.primary} />
+                <Text style={[styles.prepNoticeText, { color: colors.text }]}>
+                  المنهج الدراسي معتمد ومكتمل. التسجيلات الصوتية قيد الإعداد والمراجعة.
+                </Text>
+              </View>
+            )}
 
             <Text style={[styles.lessonsHeader, { color: colors.text, fontSize: fonts.lg }]}>
-              Lessons
+              فهرس الأبواب والدروس
             </Text>
           </View>
         }
         ListEmptyComponent={
-          <EmptyState icon="list-outline" title="No Lessons" subtitle="Lessons will be added soon." />
+          <EmptyState icon="list-outline" title="لا توجد دروس حالياً" subtitle="سيتم إضافة الفهرس قريباً بإذن الله." />
         }
       />
     </View>
@@ -153,27 +191,77 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
   },
   headerSection: { marginBottom: Spacing.lg },
-  courseTitle: { fontWeight: '800', marginBottom: Spacing.sm },
-  courseDesc: { lineHeight: 22, marginBottom: Spacing.lg },
-  metaRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.lg },
+  heroRow: {
+    flexDirection: 'row',
+    gap: Spacing.lg,
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  heroInfo: {
+    flex: 1,
+    gap: 6,
+  },
+  courseTitle: {
+    fontWeight: '800',
+    writingDirection: 'rtl',
+    lineHeight: 28,
+  },
+  authorBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  instructorText: {
+    fontWeight: '600',
+    writingDirection: 'rtl',
+  },
+  courseDesc: {
+    lineHeight: 22,
+    marginBottom: Spacing.lg,
+    writingDirection: 'rtl',
+    textAlign: 'left',
+  },
+  metaRow: { flexDirection: 'row', gap: Spacing.sm, marginTop: 2 },
   metaBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: Spacing.md,
-    paddingVertical: 6,
+    paddingVertical: 5,
     borderRadius: BorderRadius.sm,
   },
-  metaText: { fontWeight: '500' },
+  metaText: { fontWeight: '600' },
   downloadAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
+    paddingVertical: 13,
     borderRadius: BorderRadius.lg,
     gap: 8,
     marginBottom: Spacing.xl,
+    marginTop: Spacing.sm,
   },
   downloadAllText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  lessonsHeader: { fontWeight: '700', marginBottom: Spacing.sm },
+  prepNoticeBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    gap: 8,
+    marginBottom: Spacing.lg,
+    marginTop: Spacing.sm,
+  },
+  prepNoticeText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 18,
+    writingDirection: 'rtl',
+  },
+  lessonsHeader: {
+    fontWeight: '800',
+    marginBottom: Spacing.sm,
+    writingDirection: 'rtl',
+    textAlign: 'left',
+  },
 });

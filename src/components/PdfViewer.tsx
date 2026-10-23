@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,15 +15,20 @@ import { Spacing, BorderRadius } from '../theme';
 interface PdfViewerProps {
   pdfUrl: string;
   title: string;
+  localFileUri?: string;
   isDownloaded?: boolean;
   isDownloading?: boolean;
   onDownload?: () => void;
   height?: number;
 }
 
+// In-memory session cache of successfully opened PDFs
+const sessionPdfCache = new Set<string>();
+
 export function PdfViewer({
   pdfUrl,
   title,
+  localFileUri,
   isDownloaded = false,
   isDownloading = false,
   onDownload,
@@ -33,14 +38,33 @@ export function PdfViewer({
   const fonts = useScaledFont();
   const [isExpanded, setIsExpanded] = useState(false);
   const [useGoogleViewer, setUseGoogleViewer] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  // If already in session cache, do not show blocking loader
+  const effectiveSource = isDownloaded && localFileUri ? localFileUri : pdfUrl;
+  const isCached = sessionPdfCache.has(effectiveSource);
+  const [isLoading, setIsLoading] = useState(!isCached);
+
+  useEffect(() => {
+    setHasError(false);
+    if (!sessionPdfCache.has(effectiveSource)) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [effectiveSource]);
+
+  const handleDocumentLoaded = () => {
+    setIsLoading(false);
+    sessionPdfCache.add(effectiveSource);
+  };
 
   const handleOpenExternal = () => {
-    if (pdfUrl) {
+    if (effectiveSource) {
       if (Platform.OS === 'web' && typeof window !== 'undefined') {
-        window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+        window.open(effectiveSource, '_blank', 'noopener,noreferrer');
       } else {
-        Linking.openURL(pdfUrl).catch(err => {
+        Linking.openURL(effectiveSource).catch(err => {
           console.warn('Failed to open PDF URL:', err);
         });
       }
@@ -49,10 +73,10 @@ export function PdfViewer({
 
   const viewerHeight = isExpanded ? 780 : height;
 
-  // Compute the iframe src: native browser PDF vs Google Docs Viewer fallback
+  // Stream directly with page-1 view parameter to avoid downloading entire document upfront
   const iframeSrc = useGoogleViewer
-    ? `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`
-    : `${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1`;
+    ? `https://docs.google.com/viewer?url=${encodeURIComponent(effectiveSource)}&embedded=true`
+    : `${effectiveSource}#page=1&view=FitH&pagemode=none&scrollbar=1&toolbar=1`;
 
   return (
     <View
@@ -69,14 +93,14 @@ export function PdfViewer({
         <View style={styles.headerLeft}>
           <View style={[styles.pdfBadge, { backgroundColor: '#D32F2F15', borderColor: '#D32F2F30' }]}>
             <Ionicons name="document-text" size={13} color="#D32F2F" />
-            <Text style={[styles.pdfBadgeText, { color: '#D32F2F' }]}>كِتَابُ التَّوْحِيدِ</Text>
+            <Text style={[styles.pdfBadgeText, { color: '#D32F2F' }]}>كِتَاب</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-              Kitab At-Tawheed Study Text
+            <Text style={[styles.title, { color: colors.text, writingDirection: 'rtl' }]} numberOfLines={1}>
+              {title}
             </Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
-              Arabic text with vowelization & commentary
+              {isDownloaded ? 'متوفر دون اتصال (محفوظ محلياً)' : 'قراءة مباشرة مع التصفح السريع'}
             </Text>
           </View>
         </View>
@@ -94,7 +118,7 @@ export function PdfViewer({
               ]}
               onPress={onDownload}
               activeOpacity={0.7}
-              accessibilityLabel="Download Kitab At-Tawheed PDF"
+              accessibilityLabel="Download PDF"
             >
               <Ionicons
                 name={isDownloaded ? 'checkmark-circle' : isDownloading ? 'arrow-down-circle' : 'cloud-download-outline'}
@@ -102,12 +126,12 @@ export function PdfViewer({
                 color={isDownloaded ? colors.success : colors.text}
               />
               <Text style={[styles.actionBtnText, { color: isDownloaded ? colors.success : colors.text }]}>
-                {isDownloaded ? 'Saved' : isDownloading ? 'Saving...' : 'Download PDF'}
+                {isDownloaded ? 'Saved' : isDownloading ? 'Saving...' : 'Download'}
               </Text>
             </TouchableOpacity>
           )}
 
-          {/* Viewer Engine Toggle on Web (Direct vs Google Docs) */}
+          {/* Viewer Mode Toggle on Web */}
           {Platform.OS === 'web' && (
             <TouchableOpacity
               style={[styles.actionBtn, { backgroundColor: colors.surfaceVariant, borderColor: colors.border }]}
@@ -118,9 +142,9 @@ export function PdfViewer({
               activeOpacity={0.7}
               accessibilityLabel="Toggle PDF viewer engine"
             >
-              <Ionicons name="sync-outline" size={14} color={colors.text} />
+              <Ionicons name="sync-outline" size={13} color={colors.text} />
               <Text style={[styles.actionBtnText, { color: colors.text }]}>
-                {useGoogleViewer ? 'Native Mode' : 'GDocs Mode'}
+                {useGoogleViewer ? 'Fast Stream' : 'GDocs'}
               </Text>
             </TouchableOpacity>
           )}
@@ -152,36 +176,74 @@ export function PdfViewer({
       {/* Main PDF Content View */}
       {Platform.OS === 'web' ? (
         <View style={[styles.frameContainer, { height: viewerHeight, backgroundColor: isDark ? '#1a1a1a' : '#525659' }]}>
-          {isLoading && (
+          {isLoading && !hasError && (
             <View style={styles.loadingOverlay}>
               <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={[styles.loadingText, { color: '#E0E0E0' }]}>Loading Kitab At-Tawheed Text...</Text>
+              <Text style={[styles.loadingText, { color: '#E0E0E0' }]}>
+                جاري فتح الصفحة الأولى... (Loading Page 1)
+              </Text>
             </View>
           )}
-          {React.createElement('iframe', {
-            key: iframeSrc,
-            src: iframeSrc,
-            style: {
-              width: '100%',
-              height: '100%',
-              border: 'none',
-              backgroundColor: 'transparent',
-            },
-            onLoad: () => setIsLoading(false),
-            title: 'Kitab At-Tawheed PDF Document',
-          })}
+
+          {hasError ? (
+            <View style={styles.errorContainer}>
+              <Ionicons name="alert-circle-outline" size={36} color={colors.error} />
+              <Text style={[styles.errorTitle, { color: colors.text }]}>
+                تعذر تحميل الكتاب مباشرة
+              </Text>
+              <Text style={[styles.errorSubtitle, { color: colors.textSecondary }]}>
+                يمكنك فتحه في تبويب منفصل أو تجربة محرك العرض البديل
+              </Text>
+              <View style={styles.errorBtnRow}>
+                <TouchableOpacity
+                  style={[styles.retryBtn, { backgroundColor: colors.primary }]}
+                  onPress={() => {
+                    setHasError(false);
+                    setIsLoading(true);
+                  }}
+                >
+                  <Text style={styles.retryBtnText}>إعادة المحاولة</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.retryBtn, { backgroundColor: colors.surfaceVariant, borderColor: colors.border, borderWidth: 1 }]}
+                  onPress={handleOpenExternal}
+                >
+                  <Text style={[styles.retryBtnText, { color: colors.text }]}>فتح في المتصفح</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            React.createElement('iframe', {
+              key: iframeSrc,
+              src: iframeSrc,
+              style: {
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                backgroundColor: 'transparent',
+              },
+              onLoad: handleDocumentLoaded,
+              onError: () => {
+                setIsLoading(false);
+                setHasError(true);
+              },
+              title: title,
+            })
+          )}
         </View>
       ) : (
-        /* Mobile Native Document Card */
+        /* Mobile Native Document View */
         <View style={[styles.mobileCard, { backgroundColor: colors.surfaceVariant }]}>
           <View style={[styles.mobileCardIcon, { backgroundColor: colors.surface }]}>
             <Ionicons name="book-outline" size={44} color={colors.primary} />
           </View>
-          <Text style={[styles.mobileCardTitle, { color: colors.text }]}>
-            Kitab At-Tawheed (كتاب التوحيد)
+          <Text style={[styles.mobileCardTitle, { color: colors.text, writingDirection: 'rtl' }]}>
+            {title}
           </Text>
           <Text style={[styles.mobileCardSubtitle, { color: colors.textSecondary }]}>
-            Full classical Arabic text with vowelization (Tashkeel) and commentary notes (9.9 MB).
+            {isDownloaded
+              ? 'الكتاب محفوظ محلياً على جهازك ومتاح للقراءة دون اتصال بالإنترنت.'
+              : 'النص الأصلي الكامل مع الضبط بالشكل والتعليقات المعتمدة.'}
           </Text>
 
           <View style={styles.mobileActionsRow}>
@@ -191,7 +253,7 @@ export function PdfViewer({
               activeOpacity={0.8}
             >
               <Ionicons name="book-outline" size={17} color="#FFFFFF" />
-              <Text style={styles.mobileOpenBtnText}>Read in Full Screen</Text>
+              <Text style={styles.mobileOpenBtnText}>قراءة الكتاب (Full Screen)</Text>
             </TouchableOpacity>
 
             {onDownload && (
@@ -217,7 +279,7 @@ export function PdfViewer({
                     { color: isDownloaded ? colors.success : colors.text },
                   ]}
                 >
-                  {isDownloaded ? 'Downloaded' : 'Download PDF'}
+                  {isDownloaded ? 'تم الحفظ' : 'تحميل PDF'}
                 </Text>
               </TouchableOpacity>
             )}
@@ -229,7 +291,7 @@ export function PdfViewer({
       <View style={[styles.footerHint, { borderTopColor: colors.border }]}>
         <Ionicons name="information-circle-outline" size={14} color={colors.textTertiary} />
         <Text style={[styles.footerHintText, { color: colors.textSecondary }]}>
-          Scroll to read along with the Sheikh's explanation. The audio player below stays active while you read.
+          يتم تحميل الصفحة الأولى فوراً. يستمر مشغل الصوت في العمل أسفل الشاشة أثناء القراءة.
         </Text>
       </View>
     </View>
@@ -323,12 +385,44 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     zIndex: 1,
   },
   loadingText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  errorContainer: {
+    height: 320,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.xl,
+    gap: 8,
+  },
+  errorTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  errorSubtitle: {
+    fontSize: 12,
+    textAlign: 'center',
+    maxWidth: 320,
+    marginBottom: 8,
+  },
+  errorBtnRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  retryBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: BorderRadius.md,
+  },
+  retryBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 12,
   },
   mobileCard: {
     padding: Spacing.xl,

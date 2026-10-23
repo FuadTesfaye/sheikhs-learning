@@ -81,11 +81,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 2,
+    writingDirection: 'rtl',
+    textAlign: 'left',
   },
   course: {
     marginBottom: 6,
+    writingDirection: 'rtl',
+    textAlign: 'left',
   },
   progressRow: {
     flexDirection: 'row',

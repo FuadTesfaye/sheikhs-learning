@@ -43,7 +43,7 @@ export default function CategoryScreen() {
             </Text>
           )}
           <Text style={[styles.bannerDesc, { color: colors.textSecondary, fontSize: fonts.sm }]}>
-            {category.description} · {coursesInCategory.length} courses
+            {category.description} · {coursesInCategory.length} {coursesInCategory.length <= 10 ? 'كتب ومتون' : 'كتاباً'}
           </Text>
         </View>
       )}

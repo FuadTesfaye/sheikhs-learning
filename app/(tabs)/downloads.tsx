@@ -6,9 +6,9 @@ import { useTheme, useScaledFont } from '../../src/hooks';
 import { useDownloadStore } from '../../src/store';
 import { EmptyState } from '../../src/components';
 import { Spacing, BorderRadius } from '../../src/theme';
-
 import { useRouter } from 'expo-router';
 import { DownloadService } from '../../src/services/downloadService';
+import { DownloadStatus } from '../../src/types';
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -24,6 +24,7 @@ export default function DownloadsScreen() {
   const router = useRouter();
   const rawDownloads = useDownloadStore(s => s.downloads);
   const clearAllDownloads = useDownloadStore(s => s.clearAllDownloads);
+  const isOnline = DownloadService.isNetworkAvailable();
 
   const downloads = useMemo(() => {
     return Object.values(rawDownloads).sort(
@@ -34,109 +35,207 @@ export default function DownloadsScreen() {
   const storageUsed = useMemo(() => {
     return Object.values(rawDownloads)
       .filter(d => d.status === 'completed')
-      .reduce((sum, d) => sum + d.fileSize, 0);
+      .reduce((sum, d) => sum + (d.fileSize || d.downloadedBytes || 0), 0);
   }, [rawDownloads]);
 
   const handleClearAll = () => {
     Alert.alert(
-      'Clear All Downloads',
-      'This will remove all downloaded content from your device. You can re-download them later.',
+      'حذف جميع التحميلات',
+      'سيؤدي هذا إلى مسح الملفات المحفوظة محلياً من جهازك. يمكنك إعادة تحميلها في أي وقت.',
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Clear All', style: 'destructive', onPress: clearAllDownloads },
+        { text: 'إلغاء', style: 'cancel' },
+        { text: 'مسح الكل', style: 'destructive', onPress: clearAllDownloads },
       ]
     );
+  };
+
+  const getStatusLabel = (status: DownloadStatus): string => {
+    switch (status) {
+      case 'completed':
+        return 'تم الحفظ (Downloaded)';
+      case 'downloading':
+        return 'جاري التحميل (Downloading)';
+      case 'paused':
+        return 'مؤقت (Paused)';
+      case 'waiting_for_internet':
+        return 'في انتظار الاتصال (Waiting for internet)';
+      case 'failed':
+        return 'تعذر التحميل (Failed)';
+      case 'pending':
+      default:
+        return 'قيد الانتظار (Pending)';
+    }
   };
 
   const statusIcons: Record<string, string> = {
     completed: 'checkmark-circle',
     downloading: 'arrow-down-circle',
     paused: 'pause-circle',
-    pending: 'time',
+    waiting_for_internet: 'wifi-outline',
+    pending: 'time-outline',
     failed: 'alert-circle',
   };
 
-  const statusColors: Record<string, string> = {
-    completed: colors.success,
-    downloading: colors.primary,
-    paused: colors.warning,
-    pending: colors.textTertiary,
-    failed: colors.error,
+  const getStatusColor = (status: DownloadStatus) => {
+    switch (status) {
+      case 'completed':
+        return colors.success;
+      case 'downloading':
+        return colors.primary;
+      case 'paused':
+        return colors.warning;
+      case 'waiting_for_internet':
+        return '#FF8F00';
+      case 'failed':
+        return colors.error;
+      case 'pending':
+      default:
+        return colors.textTertiary;
+    }
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl }]}>Downloads</Text>
+          <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl }]}>
+            التحميلات (Downloads)
+          </Text>
           <Text style={[styles.storage, { color: colors.textSecondary, fontSize: fonts.sm }]}>
-            {formatBytes(storageUsed)} used \u00b7 Offline Ready
+            {formatBytes(storageUsed)} مستخدم · متاح للقراءة والاستماع دون اتصال
           </Text>
         </View>
         {downloads.length > 0 && (
-          <TouchableOpacity onPress={handleClearAll}>
+          <TouchableOpacity onPress={handleClearAll} accessibilityLabel="حذف جميع التحميلات">
             <Ionicons name="trash-outline" size={24} color={colors.error} />
           </TouchableOpacity>
         )}
       </View>
 
+      {/* Offline Notice Banner */}
+      {!isOnline && (
+        <View style={[styles.offlineBanner, { backgroundColor: '#FF8F0018', borderColor: '#FF8F0040' }]}>
+          <Ionicons name="cloud-offline-outline" size={18} color="#FF8F00" />
+          <Text style={[styles.offlineText, { color: colors.text }]}>
+            أنت غير متصل بالإنترنت حالياً. تم حفظ تقدم التحميل وسيمكنك الاستئناف فور عودة الاتصال.
+          </Text>
+        </View>
+      )}
+
+      {/* Downloads List */}
       <FlatList
         data={downloads}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[styles.downloadRow, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            onPress={() => router.push(`/lesson/${item.lessonId}`)}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.statusIcon, { backgroundColor: (statusColors[item.status] || colors.textTertiary) + '15' }]}>
-              <Ionicons
-                name={(statusIcons[item.status] || 'ellipse') as any}
-                size={24}
-                color={statusColors[item.status] || colors.textTertiary}
-              />
-            </View>
-            <View style={styles.downloadInfo}>
-              <Text style={[styles.downloadTitle, { color: colors.text, fontSize: fonts.md }]} numberOfLines={1}>
-                {item.title}
-              </Text>
-              <Text style={[styles.downloadMeta, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                {item.format.toUpperCase()} \u00b7 {formatBytes(item.fileSize)} \u00b7 {Math.round(item.progress * 100)}%
-              </Text>
-              {item.status === 'downloading' && (
-                <View style={[styles.progressBar, { backgroundColor: colors.progressTrack }]}>
-                  <View style={[styles.progressFill, { backgroundColor: colors.progressFill, width: `${item.progress * 100}%` }]} />
+        renderItem={({ item }) => {
+          const currentBytes = item.downloadedBytes || Math.round(item.progress * item.fileSize);
+          const totalBytes = item.fileSize;
+          const percent = Math.round(item.progress * 100);
+          const statusColor = getStatusColor(item.status);
+
+          return (
+            <TouchableOpacity
+              style={[styles.downloadRow, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={() => router.push(`/lesson/${item.lessonId}`)}
+              activeOpacity={0.7}
+            >
+              {/* Status Icon */}
+              <View style={[styles.statusIcon, { backgroundColor: statusColor + '18' }]}>
+                <Ionicons
+                  name={(statusIcons[item.status] || 'ellipse') as any}
+                  size={24}
+                  color={statusColor}
+                />
+              </View>
+
+              {/* Download Info */}
+              <View style={styles.downloadInfo}>
+                <Text style={[styles.downloadTitle, { color: colors.text, fontSize: fonts.md }]} numberOfLines={1}>
+                  {item.title}
+                </Text>
+
+                {/* Status Badge + Format */}
+                <View style={styles.statusBadgeRow}>
+                  <View style={[styles.statusBadge, { backgroundColor: statusColor + '20' }]}>
+                    <Text style={[styles.statusBadgeText, { color: statusColor, fontSize: fonts.xs }]}>
+                      {getStatusLabel(item.status)}
+                    </Text>
+                  </View>
+                  <Text style={[styles.formatText, { color: colors.textTertiary, fontSize: fonts.xs }]}>
+                    {item.format === 'audio' ? 'صوتي (MP3)' : 'كتاب (PDF)'}
+                  </Text>
                 </View>
-              )}
-            </View>
-            <View style={styles.downloadActions}>
-              {item.status === 'downloading' && (
-                <TouchableOpacity onPress={() => DownloadService.pause(item.id)}>
-                  <Ionicons name="pause" size={20} color={colors.text} />
+
+                {/* Size & Percentage Math */}
+                <Text style={[styles.downloadMeta, { color: colors.textSecondary, fontSize: fonts.xs }]}>
+                  {formatBytes(currentBytes)} / {formatBytes(totalBytes)} ({percent}%)
+                </Text>
+
+                {/* Progress Bar for Active Download or Paused */}
+                {(item.status === 'downloading' || item.status === 'paused' || item.status === 'waiting_for_internet') && (
+                  <View style={[styles.progressBar, { backgroundColor: colors.progressTrack }]}>
+                    <View
+                      style={[
+                        styles.progressFill,
+                        {
+                          backgroundColor: statusColor,
+                          width: `${percent}%`,
+                        },
+                      ]}
+                    />
+                  </View>
+                )}
+              </View>
+
+              {/* Actions Controls: Pause, Resume, Retry, Cancel */}
+              <View style={styles.downloadActions}>
+                {item.status === 'downloading' && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: colors.surfaceVariant }]}
+                    onPress={() => DownloadService.pause(item.id)}
+                    accessibilityLabel="إيقاف مؤقت"
+                  >
+                    <Ionicons name="pause" size={18} color={colors.text} />
+                  </TouchableOpacity>
+                )}
+
+                {(item.status === 'paused' || item.status === 'waiting_for_internet') && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: colors.primary }]}
+                    onPress={() => DownloadService.resume(item.id)}
+                    accessibilityLabel="استئناف التحميل"
+                  >
+                    <Ionicons name="play" size={18} color="#FFFFFF" />
+                  </TouchableOpacity>
+                )}
+
+                {item.status === 'failed' && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: colors.warning + '20' }]}
+                    onPress={() => DownloadService.retry(item.id)}
+                    accessibilityLabel="إعادة المحاولة"
+                  >
+                    <Ionicons name="refresh" size={18} color={colors.warning} />
+                  </TouchableOpacity>
+                )}
+
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: colors.error + '15' }]}
+                  onPress={() => DownloadService.cancel(item.id)}
+                  accessibilityLabel="إلغاء وحذف"
+                >
+                  <Ionicons name="trash-outline" size={18} color={colors.error} />
                 </TouchableOpacity>
-              )}
-              {item.status === 'paused' && (
-                <TouchableOpacity onPress={() => DownloadService.resume(item.id)}>
-                  <Ionicons name="play" size={20} color={colors.text} />
-                </TouchableOpacity>
-              )}
-              {item.status === 'failed' && (
-                <TouchableOpacity onPress={() => DownloadService.resume(item.id)}>
-                  <Ionicons name="refresh" size={20} color={colors.warning} />
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity onPress={() => DownloadService.cancel(item.id)}>
-                <Ionicons name="close" size={20} color={colors.error} />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        )}
+              </View>
+            </TouchableOpacity>
+          );
+        }}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <EmptyState
             icon="cloud-download-outline"
-            title="No Downloads"
-            subtitle="Download lessons to access them offline. Tap the download button on any lesson."
+            title="لا توجد تحميلات"
+            subtitle="قم بتحميل الدروس والكتب لقراءتها والاستماع إليها دون الحاجة للاتصال بالإنترنت."
           />
         }
       />
@@ -161,12 +260,28 @@ const styles = StyleSheet.create({
   },
   title: { fontWeight: '800' },
   storage: { marginTop: 2 },
-  list: { paddingHorizontal: Spacing.lg, flexGrow: 1 },
+  offlineBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: Spacing.lg,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    gap: 8,
+    marginBottom: Spacing.sm,
+  },
+  offlineText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 18,
+    writingDirection: 'rtl',
+  },
+  list: { paddingHorizontal: Spacing.lg, flexGrow: 1, paddingBottom: Spacing.xl },
   downloadRow: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: Spacing.md,
-    borderRadius: BorderRadius.md,
+    borderRadius: BorderRadius.lg,
     borderWidth: 1,
     marginBottom: Spacing.sm,
     gap: Spacing.md,
@@ -179,9 +294,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   downloadInfo: { flex: 1 },
-  downloadTitle: { fontWeight: '600', marginBottom: 2 },
-  downloadMeta: {},
-  progressBar: { height: 4, borderRadius: 2, marginTop: 6, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 2 },
-  downloadActions: { flexDirection: 'row', gap: Spacing.md },
+  downloadTitle: { fontWeight: '700', marginBottom: 2, writingDirection: 'rtl', textAlign: 'left' },
+  statusBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  statusBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.sm,
+  },
+  statusBadgeText: {
+    fontWeight: '700',
+  },
+  formatText: {
+    fontWeight: '500',
+  },
+  downloadMeta: {
+    fontVariant: ['tabular-nums'],
+    marginTop: 2,
+  },
+  progressBar: { height: 5, borderRadius: 2.5, marginTop: 6, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 2.5 },
+  downloadActions: { flexDirection: 'row', gap: 6, alignItems: 'center' },
+  actionButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

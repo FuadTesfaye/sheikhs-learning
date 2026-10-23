@@ -1,4 +1,21 @@
 import { mock } from 'bun:test';
+import { plugin } from 'bun';
+import { resolve } from 'path';
+
+plugin({
+  name: 'mock-react-native',
+  setup(build) {
+    build.onResolve({ filter: /^react-native$/ }, () => {
+      return { path: resolve(__dirname, './mocks/react-native.ts') };
+    });
+    build.onLoad({ filter: /\.(png|jpg|jpeg|gif|webp|svg)$/ }, () => {
+      return {
+        contents: 'module.exports = 1;',
+        loader: 'js',
+      };
+    });
+  },
+});
 
 // Mock AsyncStorage
 mock.module('@react-native-async-storage/async-storage', () => {
@@ -49,9 +66,18 @@ mock.module('react-native', () => {
     },
     View: (props: any) => props.children || null,
     Text: (props: any) => props.children || null,
+    Image: () => null,
     TouchableOpacity: (props: any) => props.children || null,
     ScrollView: (props: any) => props.children || null,
+    FlatList: (props: any) => props.children || null,
+    TextInput: (props: any) => null,
     ActivityIndicator: () => null,
+    PanResponder: {
+      create: (config: any) => ({
+        panHandlers: {},
+        ...config,
+      }),
+    },
   };
 });
 
