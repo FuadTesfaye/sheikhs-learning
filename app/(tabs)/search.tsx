@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from 'r
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme, useScaledFont } from '../../src/hooks';
+import { useTheme, useScaledFont, useTranslation } from '../../src/hooks';
 import { courses, lessons, categories } from '../../src/data/mockData';
 import { EmptyState } from '../../src/components';
 import { Spacing, BorderRadius } from '../../src/theme';
@@ -16,23 +16,67 @@ type SearchResult = {
   icon: string;
 };
 
-const TRANSLITERATION_MAP: Record<string, string[]> = {
-  'crs-1': ['tawheed', 'tawhid', 'monotheism', 'aqeedah', 'kitab at-tawheed', 'muhammad ibn abd al-wahhab'],
-  'crs-2': ['usool', 'usul', 'thalatha', 'three principles', 'aqeedah'],
-  'crs-3': ['qawaid', 'four principles', 'qawaid arbaa', 'aqeedah'],
-  'crs-4': ['kashf', 'shubuhat', 'removal of doubts'],
-  'crs-5': ['tafsir', 'fatiha', 'surah al-fatiha', 'quran', 'amma'],
-  'crs-6': ['hadith', 'nawawi', '40 hadith', 'forty hadith'],
-  'crs-7': ['fiqh', 'salah', 'umdat al-fiqh', 'prayer'],
-  'crs-8': ['seerah', 'prophet', 'life of the prophet', 'sirah'],
-  'crs-9': ['nahu', 'sarf', 'grammar', 'arabic', 'ajrumiyyah'],
-  'crs-10': ['tajweed', 'quran recitation', 'tuhfat al-atfal'],
-  'crs-11': ['adab', 'manner', 'ethics', 'hilyat talib al-ilm'],
+const MULTILINGUAL_SEARCH_MAP: Record<string, string[]> = {
+  'crs-1': [
+    'tawheed', 'tawhid', 'monotheism', 'aqeedah', 'kitab at-tawheed', 'muhammad ibn abd al-wahhab',
+    'ተወሂድ', 'አቂዳ', 'የተወሂድ ኪታብ', 'እምነት',
+    'tawhiida', 'aqiidaa', 'kitaaba tawhiidaa', 'waaqayyummaa',
+  ],
+  'crs-2': [
+    'usool', 'usul', 'thalatha', 'three principles', 'aqeedah',
+    'ኡሱል', 'ሶስቱ መሰረቶች', 'አቂዳ',
+    'usuula', 'bu\'uura sadan', 'aqiidaa',
+  ],
+  'crs-3': [
+    'qawaid', 'four principles', 'qawaid arbaa', 'aqeedah',
+    'ቀዋዒድ', 'አራቱ ህጎች', 'መርሆዎች',
+    'qawaa\'ida', 'qajeelfama afuran',
+  ],
+  'crs-4': [
+    'kashf', 'shubuhat', 'removal of doubts',
+    'ከሽፍ', 'ሹቡሃት', 'ጥርጣሬዎችን ማጥራት',
+    'kashfii', 'shakkiwwan saaxiluu',
+  ],
+  'crs-5': [
+    'tafsir', 'fatiha', 'surah al-fatiha', 'quran', 'amma',
+    'ተፍሲር', 'ፋቲሃ', 'ቁርኣን', 'ጁዝእ አማ',
+    'tafsiira', 'faatihaa', 'qur\'aana',
+  ],
+  'crs-6': [
+    'hadith', 'nawawi', '40 hadith', 'forty hadith',
+    'ሐዲስ', 'ነወዊ', 'አርባኢን', 'አርባ ሐዲሶች',
+    'hadiisa', 'nawawii', 'hadiisa 40',
+  ],
+  'crs-7': [
+    'fiqh', 'salah', 'umdat al-fiqh', 'prayer', 'worship',
+    'ፊቅህ', 'ሶላት', 'ሰላት', 'ኡምደቱል ፊቅህ', 'ኢባዳ',
+    'fiqhii', 'salaata', 'sagada', 'ibaadaa',
+  ],
+  'crs-8': [
+    'seerah', 'prophet', 'life of the prophet', 'sirah',
+    'ሲራ', 'የነቢዩ ታሪክ', 'ታሪክ',
+    'seenaa', 'seenaa nabiyyii', 'nabiyyii',
+  ],
+  'crs-9': [
+    'nahu', 'sarf', 'grammar', 'arabic', 'ajrumiyyah',
+    'ነህው', 'ሰርፍ', 'ሰዋሰው', 'አረብኛ', 'አጅሩሚያ',
+    'nahwii', 'sarfii', 'seera afaanii', 'afaan arabaa',
+  ],
+  'crs-10': [
+    'tajweed', 'quran recitation', 'tuhfat al-atfal',
+    'ተጅዊድ', 'አነባበብ', 'ቱሕፈቱል አጥፋል',
+    'tajwiida', 'dubbisa qur\'aanaa',
+  ],
+  'crs-11': [
+    'adab', 'manner', 'ethics', 'hilyat talib al-ilm',
+    'አደብ', 'ስነ-ምግባር', 'ሂልየቱ ጣሊቢል ኢልም',
+    'aadaa', 'naamusa', 'amala gaarii',
+  ],
 };
 
 function normalizeArabic(text: string): string {
   return text
-    .replace(/[\u064B-\u065F\u0670]/g, '') // remove tashkeel
+    .replace(/[\u064B-\u065F\u0670]/g, '')
     .replace(/[أإآ]/g, 'ا')
     .replace(/ة/g, 'ه')
     .replace(/ى/g, 'ي')
@@ -42,6 +86,7 @@ function normalizeArabic(text: string): string {
 export default function SearchScreen() {
   const { colors } = useTheme();
   const fonts = useScaledFont();
+  const { t, isRTL } = useTranslation();
   const router = useRouter();
   const [query, setQuery] = useState('');
 
@@ -51,37 +96,40 @@ export default function SearchScreen() {
     const qNorm = normalizeArabic(qRaw);
     const found: SearchResult[] = [];
 
-    // 1. Search Categories
+    // 1. Search Categories (with translated names)
     categories.forEach(c => {
+      const loc = t.categories[c.id];
       const match =
         normalizeArabic(c.name).includes(qNorm) ||
+        (loc && (loc.name.toLowerCase().includes(qRaw) || loc.description.toLowerCase().includes(qRaw))) ||
         (c.arabicName && normalizeArabic(c.arabicName).includes(qNorm)) ||
         c.description.toLowerCase().includes(qRaw);
+
       if (match) {
         found.push({
           id: c.id,
-          title: c.name,
-          subtitle: c.description,
+          title: loc?.name || c.name,
+          subtitle: loc?.description || c.description,
           type: 'category',
           icon: 'folder-outline',
         });
       }
     });
 
-    // 2. Search Courses / Kitabs
+    // 2. Search Courses / Kitabs (multilingual terms)
     courses.forEach(c => {
-      const translits = TRANSLITERATION_MAP[c.id] || [];
+      const translits = MULTILINGUAL_SEARCH_MAP[c.id] || [];
       const match =
         normalizeArabic(c.title).includes(qNorm) ||
         normalizeArabic(c.description).includes(qNorm) ||
         normalizeArabic(c.instructor).includes(qNorm) ||
-        translits.some(t => t.includes(qRaw));
+        translits.some(term => term.toLowerCase().includes(qRaw) || qRaw.includes(term.toLowerCase()));
 
       if (match) {
         found.push({
           id: c.id,
           title: c.title,
-          subtitle: `${c.instructor} · ${c.totalLessons} دروس`,
+          subtitle: `${c.instructor} · ${t.common.lessonsCount(c.totalLessons)}`,
           type: 'course',
           icon: 'book-outline',
         });
@@ -92,13 +140,14 @@ export default function SearchScreen() {
     lessons.forEach(l => {
       const match =
         normalizeArabic(l.title).includes(qNorm) ||
-        normalizeArabic(l.description).includes(qNorm);
+        normalizeArabic(l.description).includes(qNorm) ||
+        l.title.toLowerCase().includes(qRaw);
 
       if (match) {
         found.push({
           id: l.id,
           title: l.title,
-          subtitle: l.type === 'audio' ? 'درس صوتي' : l.type === 'pdf' ? 'كتاب PDF' : 'درس دراسي',
+          subtitle: l.type === 'audio' ? t.search.lessonAudioBadge : t.search.lessonPdfBadge,
           type: 'lesson',
           icon: l.type === 'audio' ? 'musical-notes-outline' : 'document-text-outline',
         });
@@ -106,7 +155,7 @@ export default function SearchScreen() {
     });
 
     return found.slice(0, 30);
-  }, [query]);
+  }, [query, t]);
 
   const handlePress = useCallback((item: SearchResult) => {
     if (item.type === 'category') router.push(`/category/${item.id}`);
@@ -117,14 +166,16 @@ export default function SearchScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl }]}>البحث</Text>
+        <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          {t.search.title}
+        </Text>
       </View>
 
       <View style={[styles.searchBar, { backgroundColor: colors.surfaceVariant, borderColor: colors.border }]}>
         <Ionicons name="search" size={20} color={colors.icon} />
         <TextInput
-          style={[styles.input, { color: colors.text, fontSize: fonts.md, writingDirection: 'auto' }]}
-          placeholder="ابحث عن كتاب، باب، أو موضوع..."
+          style={[styles.input, { color: colors.text, fontSize: fonts.md, textAlign: isRTL ? 'right' : 'left' }]}
+          placeholder={t.search.inputPlaceholder}
           placeholderTextColor={colors.textTertiary}
           value={query}
           onChangeText={setQuery}
@@ -159,16 +210,24 @@ export default function SearchScreen() {
                 {item.subtitle}
               </Text>
             </View>
-            <Ionicons name="chevron-back" size={18} color={colors.textTertiary} />
+            <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.textTertiary} />
           </TouchableOpacity>
         )}
         keyExtractor={item => `${item.type}-${item.id}`}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           query.length >= 2 ? (
-            <EmptyState icon="search-outline" title="لا توجد نتائج" subtitle={`لم نجد نتائج مطابقة لـ "${query}"`} />
+            <EmptyState
+              icon="search-outline"
+              title={t.search.noResultsTitle}
+              subtitle={t.search.noResultsSubtitle(query)}
+            />
           ) : (
-            <EmptyState icon="search" title="البحث في المكتبة" subtitle="اكتب حرفين أو أكثر للبحث في جميع الكتب والأبواب والدروس" />
+            <EmptyState
+              icon="search"
+              title={t.search.emptyQueryTitle}
+              subtitle={t.search.emptyQuerySubtitle}
+            />
           )
         }
       />
@@ -184,7 +243,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.lg, paddingBottom: Spacing.sm },
-  title: { fontWeight: '800', textAlign: 'left' },
+  title: { fontWeight: '800' },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -196,8 +255,8 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: Spacing.md,
   },
-  input: { flex: 1, textAlign: 'right' },
-  list: { paddingHorizontal: Spacing.lg, flexGrow: 1 },
+  input: { flex: 1 },
+  list: { paddingHorizontal: Spacing.lg, flexGrow: 1, paddingBottom: Spacing.xl },
   resultRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -213,6 +272,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resultInfo: { flex: 1 },
-  resultTitle: { fontWeight: '700', writingDirection: 'rtl', textAlign: 'left', marginBottom: 2 },
-  resultSubtitle: { writingDirection: 'rtl', textAlign: 'left' },
+  resultTitle: { fontWeight: '700', textAlign: 'left', marginBottom: 2 },
+  resultSubtitle: { textAlign: 'left' },
 });

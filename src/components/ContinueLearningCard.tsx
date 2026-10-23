@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LessonProgress } from '../types';
 import { getLessonById, getCourseById } from '../data/mockData';
-import { useTheme, useScaledFont } from '../hooks';
+import { useTheme, useScaledFont, useTranslation } from '../hooks';
 import { Spacing, BorderRadius } from '../theme';
 
 interface Props {
@@ -20,6 +20,7 @@ function formatDuration(seconds: number): string {
 export const ContinueLearningCard = memo(({ progress, onPress }: Props) => {
   const { colors } = useTheme();
   const fonts = useScaledFont();
+  const { t, isRTL } = useTranslation();
   const lesson = getLessonById(progress.lessonId);
   const course = lesson ? getCourseById(lesson.courseId) : undefined;
 
@@ -33,16 +34,17 @@ export const ContinueLearningCard = memo(({ progress, onPress }: Props) => {
       style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
       onPress={() => onPress(progress.lessonId)}
       activeOpacity={0.7}
+      accessibilityLabel={lesson.title}
     >
       <View style={[styles.playIcon, { backgroundColor: colors.primary }]}>
         <Ionicons name="play" size={20} color="#fff" />
       </View>
       <View style={styles.info}>
-        <Text style={[styles.title, { color: colors.text, fontSize: fonts.md }]} numberOfLines={1}>
+        <Text style={[styles.title, { color: colors.text, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
           {lesson.title}
         </Text>
         {course && (
-          <Text style={[styles.course, { color: colors.textSecondary, fontSize: fonts.xs }]} numberOfLines={1}>
+          <Text style={[styles.course, { color: colors.textSecondary, fontSize: fonts.xs, writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
             {course.title}
           </Text>
         )}
@@ -51,7 +53,7 @@ export const ContinueLearningCard = memo(({ progress, onPress }: Props) => {
             <View style={[styles.progressFill, { backgroundColor: colors.progressFill, width: `${percent}%` }]} />
           </View>
           <Text style={[styles.remaining, { color: colors.textTertiary, fontSize: fonts.xs }]}>
-            {formatDuration(Math.round(remaining))} left
+            {t.home.remainingTime(formatDuration(Math.round(remaining)))}
           </Text>
         </View>
       </View>
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     marginRight: Spacing.md,
-    width: 280,
+    width: 290,
     gap: Spacing.md,
   },
   playIcon: {
@@ -83,12 +85,10 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: '700',
     marginBottom: 2,
-    writingDirection: 'rtl',
     textAlign: 'left',
   },
   course: {
     marginBottom: 6,
-    writingDirection: 'rtl',
     textAlign: 'left',
   },
   progressRow: {
@@ -107,6 +107,6 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   remaining: {
-    minWidth: 52,
+    minWidth: 60,
   },
 });

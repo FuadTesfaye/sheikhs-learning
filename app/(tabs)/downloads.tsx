@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme, useScaledFont } from '../../src/hooks';
+import { useTheme, useScaledFont, useTranslation } from '../../src/hooks';
 import { useDownloadStore } from '../../src/store';
 import { EmptyState } from '../../src/components';
 import { Spacing, BorderRadius } from '../../src/theme';
@@ -10,17 +10,10 @@ import { useRouter } from 'expo-router';
 import { DownloadService } from '../../src/services/downloadService';
 import { DownloadStatus } from '../../src/types';
 
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-}
-
 export default function DownloadsScreen() {
   const { colors } = useTheme();
   const fonts = useScaledFont();
+  const { t, isRTL } = useTranslation();
   const router = useRouter();
   const rawDownloads = useDownloadStore(s => s.downloads);
   const clearAllDownloads = useDownloadStore(s => s.clearAllDownloads);
@@ -40,31 +33,17 @@ export default function DownloadsScreen() {
 
   const handleClearAll = () => {
     Alert.alert(
-      'حذف جميع التحميلات',
-      'سيؤدي هذا إلى مسح الملفات المحفوظة محلياً من جهازك. يمكنك إعادة تحميلها في أي وقت.',
+      t.downloads.clearAlertTitle,
+      t.downloads.clearAlertDesc,
       [
-        { text: 'إلغاء', style: 'cancel' },
-        { text: 'مسح الكل', style: 'destructive', onPress: clearAllDownloads },
+        { text: t.common.cancel, style: 'cancel' },
+        { text: t.common.clearAll, style: 'destructive', onPress: clearAllDownloads },
       ]
     );
   };
 
   const getStatusLabel = (status: DownloadStatus): string => {
-    switch (status) {
-      case 'completed':
-        return 'تم الحفظ (Downloaded)';
-      case 'downloading':
-        return 'جاري التحميل (Downloading)';
-      case 'paused':
-        return 'مؤقت (Paused)';
-      case 'waiting_for_internet':
-        return 'في انتظار الاتصال (Waiting for internet)';
-      case 'failed':
-        return 'تعذر التحميل (Failed)';
-      case 'pending':
-      default:
-        return 'قيد الانتظار (Pending)';
-    }
+    return t.downloads.status[status] || t.downloads.status.pending;
   };
 
   const statusIcons: Record<string, string> = {
@@ -99,15 +78,15 @@ export default function DownloadsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl }]}>
-            التحميلات (Downloads)
+          <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.downloads.title}
           </Text>
-          <Text style={[styles.storage, { color: colors.textSecondary, fontSize: fonts.sm }]}>
-            {formatBytes(storageUsed)} مستخدم · متاح للقراءة والاستماع دون اتصال
+          <Text style={[styles.storage, { color: colors.textSecondary, fontSize: fonts.sm, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.downloads.storageInfo(t.common.formatBytes(storageUsed))}
           </Text>
         </View>
         {downloads.length > 0 && (
-          <TouchableOpacity onPress={handleClearAll} accessibilityLabel="حذف جميع التحميلات">
+          <TouchableOpacity onPress={handleClearAll} accessibilityLabel={t.downloads.clearAlertTitle}>
             <Ionicons name="trash-outline" size={24} color={colors.error} />
           </TouchableOpacity>
         )}
@@ -117,8 +96,8 @@ export default function DownloadsScreen() {
       {!isOnline && (
         <View style={[styles.offlineBanner, { backgroundColor: '#FF8F0018', borderColor: '#FF8F0040' }]}>
           <Ionicons name="cloud-offline-outline" size={18} color="#FF8F00" />
-          <Text style={[styles.offlineText, { color: colors.text }]}>
-            أنت غير متصل بالإنترنت حالياً. تم حفظ تقدم التحميل وسيمكنك الاستئناف فور عودة الاتصال.
+          <Text style={[styles.offlineText, { color: colors.text, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.downloads.offlineBanner}
           </Text>
         </View>
       )}
@@ -149,7 +128,7 @@ export default function DownloadsScreen() {
 
               {/* Download Info */}
               <View style={styles.downloadInfo}>
-                <Text style={[styles.downloadTitle, { color: colors.text, fontSize: fonts.md }]} numberOfLines={1}>
+                <Text style={[styles.downloadTitle, { color: colors.text, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
                   {item.title}
                 </Text>
 
@@ -161,13 +140,13 @@ export default function DownloadsScreen() {
                     </Text>
                   </View>
                   <Text style={[styles.formatText, { color: colors.textTertiary, fontSize: fonts.xs }]}>
-                    {item.format === 'audio' ? 'صوتي (MP3)' : 'كتاب (PDF)'}
+                    {item.format === 'audio' ? t.downloads.format.audio : t.downloads.format.pdf}
                   </Text>
                 </View>
 
                 {/* Size & Percentage Math */}
                 <Text style={[styles.downloadMeta, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                  {formatBytes(currentBytes)} / {formatBytes(totalBytes)} ({percent}%)
+                  {t.common.formatBytes(currentBytes)} / {t.common.formatBytes(totalBytes)} ({percent}%)
                 </Text>
 
                 {/* Progress Bar for Active Download or Paused */}
@@ -192,7 +171,7 @@ export default function DownloadsScreen() {
                   <TouchableOpacity
                     style={[styles.actionButton, { backgroundColor: colors.surfaceVariant }]}
                     onPress={() => DownloadService.pause(item.id)}
-                    accessibilityLabel="إيقاف مؤقت"
+                    accessibilityLabel="Pause"
                   >
                     <Ionicons name="pause" size={18} color={colors.text} />
                   </TouchableOpacity>
@@ -202,7 +181,7 @@ export default function DownloadsScreen() {
                   <TouchableOpacity
                     style={[styles.actionButton, { backgroundColor: colors.primary }]}
                     onPress={() => DownloadService.resume(item.id)}
-                    accessibilityLabel="استئناف التحميل"
+                    accessibilityLabel="Resume"
                   >
                     <Ionicons name="play" size={18} color="#FFFFFF" />
                   </TouchableOpacity>
@@ -212,7 +191,7 @@ export default function DownloadsScreen() {
                   <TouchableOpacity
                     style={[styles.actionButton, { backgroundColor: colors.warning + '20' }]}
                     onPress={() => DownloadService.retry(item.id)}
-                    accessibilityLabel="إعادة المحاولة"
+                    accessibilityLabel={t.common.retry}
                   >
                     <Ionicons name="refresh" size={18} color={colors.warning} />
                   </TouchableOpacity>
@@ -221,7 +200,7 @@ export default function DownloadsScreen() {
                 <TouchableOpacity
                   style={[styles.actionButton, { backgroundColor: colors.error + '15' }]}
                   onPress={() => DownloadService.cancel(item.id)}
-                  accessibilityLabel="إلغاء وحذف"
+                  accessibilityLabel={t.common.clear}
                 >
                   <Ionicons name="trash-outline" size={18} color={colors.error} />
                 </TouchableOpacity>
@@ -234,8 +213,8 @@ export default function DownloadsScreen() {
         ListEmptyComponent={
           <EmptyState
             icon="cloud-download-outline"
-            title="لا توجد تحميلات"
-            subtitle="قم بتحميل الدروس والكتب لقراءتها والاستماع إليها دون الحاجة للاتصال بالإنترنت."
+            title={t.downloads.emptyTitle}
+            subtitle={t.downloads.emptySubtitle}
           />
         }
       />
@@ -274,7 +253,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     lineHeight: 18,
-    writingDirection: 'rtl',
   },
   list: { paddingHorizontal: Spacing.lg, flexGrow: 1, paddingBottom: Spacing.xl },
   downloadRow: {
@@ -294,7 +272,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   downloadInfo: { flex: 1 },
-  downloadTitle: { fontWeight: '700', marginBottom: 2, writingDirection: 'rtl', textAlign: 'left' },
+  downloadTitle: { fontWeight: '700', marginBottom: 2, textAlign: 'left' },
   statusBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',

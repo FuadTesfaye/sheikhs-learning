@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Category } from '../types';
-import { useTheme, useScaledFont } from '../hooks';
+import { useTheme, useScaledFont, useTranslation } from '../hooks';
 import { Spacing, BorderRadius } from '../theme';
 
 interface Props {
@@ -24,6 +24,10 @@ const ICON_MAP: Record<string, keyof typeof Ionicons.glyphMap> = {
 export const CategoryCard = memo(({ category, onPress }: Props) => {
   const { colors } = useTheme();
   const fonts = useScaledFont();
+  const { t, isRTL } = useTranslation();
+
+  const localized = t.categories[category.id];
+  const displayName = localized?.name || category.name;
 
   return (
     <TouchableOpacity
@@ -36,6 +40,7 @@ export const CategoryCard = memo(({ category, onPress }: Props) => {
       ]}
       onPress={() => onPress(category)}
       activeOpacity={0.7}
+      accessibilityLabel={displayName}
     >
       <View style={[styles.iconContainer, { backgroundColor: category.color + '18' }]}>
         <Ionicons
@@ -44,16 +49,21 @@ export const CategoryCard = memo(({ category, onPress }: Props) => {
           color={category.color}
         />
       </View>
-      <Text style={[styles.name, { color: colors.text, fontSize: fonts.md }]} numberOfLines={1}>
-        {category.name}
+      <Text
+        style={[
+          styles.name,
+          {
+            color: colors.text,
+            fontSize: fonts.sm,
+            writingDirection: isRTL ? 'rtl' : 'ltr',
+          },
+        ]}
+        numberOfLines={2}
+      >
+        {displayName}
       </Text>
-      {category.arabicName && (
-        <Text style={[styles.arabic, { color: colors.textSecondary, fontSize: fonts.sm }]} numberOfLines={1}>
-          {category.arabicName}
-        </Text>
-      )}
       <Text style={[styles.count, { color: colors.textTertiary, fontSize: fonts.xs }]}>
-        {category.courseCount} courses
+        {t.common.lessonsCount(category.courseCount)}
       </Text>
     </TouchableOpacity>
   );
@@ -62,31 +72,30 @@ export const CategoryCard = memo(({ category, onPress }: Props) => {
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    padding: Spacing.lg,
+    padding: Spacing.md,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     alignItems: 'center',
     margin: Spacing.xs,
-    minWidth: 100,
+    minHeight: 115,
+    justifyContent: 'space-between',
   },
   iconContainer: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   name: {
-    fontWeight: '600',
+    fontWeight: '700',
     textAlign: 'center',
     marginBottom: 2,
-  },
-  arabic: {
-    textAlign: 'center',
-    marginBottom: 4,
+    lineHeight: 16,
   },
   count: {
     textAlign: 'center',
+    marginTop: 'auto',
   },
 });

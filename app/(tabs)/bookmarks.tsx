@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme, useScaledFont } from '../../src/hooks';
+import { useTheme, useScaledFont, useTranslation } from '../../src/hooks';
 import { useLearningStore, useDownloadStore } from '../../src/store';
 import { getLessonById } from '../../src/data/mockData';
 import { LessonRow, EmptyState } from '../../src/components';
@@ -12,6 +12,7 @@ import { Lesson } from '../../src/types';
 export default function BookmarksScreen() {
   const { colors } = useTheme();
   const fonts = useScaledFont();
+  const { t, isRTL } = useTranslation();
   const router = useRouter();
   const bookmarks = useLearningStore(s => s.bookmarks);
   const progress = useLearningStore(s => s.progress);
@@ -35,9 +36,11 @@ export default function BookmarksScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl }]}>Bookmarks</Text>
-        <Text style={[styles.count, { color: colors.textSecondary, fontSize: fonts.sm }]}>
-          {bookmarkedLessons.length} saved
+        <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          {t.bookmarks.title}
+        </Text>
+        <Text style={[styles.count, { color: colors.textSecondary, fontSize: fonts.sm, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          {t.bookmarks.savedCount(bookmarkedLessons.length)}
         </Text>
       </View>
 
@@ -59,8 +62,8 @@ export default function BookmarksScreen() {
         ListEmptyComponent={
           <EmptyState
             icon="bookmark-outline"
-            title="No Bookmarks Yet"
-            subtitle="Tap the bookmark icon on any lesson to save it here for quick access."
+            title={t.bookmarks.emptyTitle}
+            subtitle={t.bookmarks.emptySubtitle}
           />
         }
       />
@@ -82,5 +85,5 @@ const styles = StyleSheet.create({
   },
   title: { fontWeight: '800' },
   count: { marginTop: 2 },
-  list: { paddingHorizontal: Spacing.lg, flexGrow: 1 },
+  list: { paddingHorizontal: Spacing.lg, flexGrow: 1, paddingBottom: Spacing.xl },
 });
