@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme, useScaledFont } from '../hooks';
+import { useTheme, useScaledFont, useTranslation } from '../hooks';
 import { Spacing, BorderRadius } from '../theme';
 
 interface PdfViewerProps {
@@ -36,6 +36,7 @@ export function PdfViewer({
 }: PdfViewerProps) {
   const { colors, isDark } = useTheme();
   const fonts = useScaledFont();
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [useGoogleViewer, setUseGoogleViewer] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -93,14 +94,14 @@ export function PdfViewer({
         <View style={styles.headerLeft}>
           <View style={[styles.pdfBadge, { backgroundColor: '#D32F2F15', borderColor: '#D32F2F30' }]}>
             <Ionicons name="document-text" size={13} color="#D32F2F" />
-            <Text style={[styles.pdfBadgeText, { color: '#D32F2F' }]}>كِتَاب</Text>
+            <Text style={[styles.pdfBadgeText, { color: '#D32F2F' }]}>{t.pdfViewer.badge}</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.title, { color: colors.text, writingDirection: 'rtl' }]} numberOfLines={1}>
               {title}
             </Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
-              {isDownloaded ? 'متوفر دون اتصال (محفوظ محلياً)' : 'قراءة مباشرة مع التصفح السريع'}
+              {isDownloaded ? t.pdfViewer.offlineSubtitle : t.pdfViewer.onlineSubtitle}
             </Text>
           </View>
         </View>
@@ -126,7 +127,7 @@ export function PdfViewer({
                 color={isDownloaded ? colors.success : colors.text}
               />
               <Text style={[styles.actionBtnText, { color: isDownloaded ? colors.success : colors.text }]}>
-                {isDownloaded ? 'Saved' : isDownloading ? 'Saving...' : 'Download'}
+                {isDownloaded ? t.pdfViewer.saved : isDownloading ? t.pdfViewer.downloading : t.pdfViewer.download}
               </Text>
             </TouchableOpacity>
           )}
@@ -144,7 +145,7 @@ export function PdfViewer({
             >
               <Ionicons name="sync-outline" size={13} color={colors.text} />
               <Text style={[styles.actionBtnText, { color: colors.text }]}>
-                {useGoogleViewer ? 'Fast Stream' : 'GDocs'}
+                {useGoogleViewer ? t.pdfViewer.fastStream : t.pdfViewer.gdocs}
               </Text>
             </TouchableOpacity>
           )}
@@ -180,7 +181,7 @@ export function PdfViewer({
             <View style={styles.loadingOverlay}>
               <ActivityIndicator size="small" color={colors.primary} />
               <Text style={[styles.loadingText, { color: '#E0E0E0' }]}>
-                جاري فتح الصفحة الأولى... (Loading Page 1)
+                {t.pdfViewer.loadingPageOne}
               </Text>
             </View>
           )}
@@ -189,10 +190,10 @@ export function PdfViewer({
             <View style={styles.errorContainer}>
               <Ionicons name="alert-circle-outline" size={36} color={colors.error} />
               <Text style={[styles.errorTitle, { color: colors.text }]}>
-                تعذر تحميل الكتاب مباشرة
+                {t.pdfViewer.errorTitle}
               </Text>
               <Text style={[styles.errorSubtitle, { color: colors.textSecondary }]}>
-                يمكنك فتحه في تبويب منفصل أو تجربة محرك العرض البديل
+                {t.pdfViewer.errorSubtitle}
               </Text>
               <View style={styles.errorBtnRow}>
                 <TouchableOpacity
@@ -202,13 +203,13 @@ export function PdfViewer({
                     setIsLoading(true);
                   }}
                 >
-                  <Text style={styles.retryBtnText}>إعادة المحاولة</Text>
+                  <Text style={styles.retryBtnText}>{t.pdfViewer.retry}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.retryBtn, { backgroundColor: colors.surfaceVariant, borderColor: colors.border, borderWidth: 1 }]}
                   onPress={handleOpenExternal}
                 >
-                  <Text style={[styles.retryBtnText, { color: colors.text }]}>فتح في المتصفح</Text>
+                  <Text style={[styles.retryBtnText, { color: colors.text }]}>{t.pdfViewer.openBrowser}</Text>
                 </TouchableOpacity>
               </View>
             </View>

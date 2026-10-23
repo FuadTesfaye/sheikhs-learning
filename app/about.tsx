@@ -6,12 +6,13 @@ import {
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme, useScaledFont } from '../src/hooks';
+import { useTheme, useScaledFont, useTranslation } from '../src/hooks';
 import { Spacing, BorderRadius } from '../src/theme';
 
 export default function AboutScreen() {
   const { colors, isDark } = useTheme();
   const fonts = useScaledFont();
+  const { t, isRTL } = useTranslation();
   const router = useRouter();
   const [prayed, setPrayed] = useState(false);
 
@@ -31,10 +32,10 @@ export default function AboutScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen
         options={{
-          headerTitle: 'About Bunyan & The Sheikh',
+          headerTitle: t.about.headerTitle,
           headerStyle: { backgroundColor: colors.surface },
           headerTintColor: colors.text,
-          headerBackTitle: 'Back',
+          headerBackTitle: t.common.back,
         }}
       />
 
@@ -42,8 +43,8 @@ export default function AboutScreen() {
         {/* Banner Card */}
         <View style={[styles.bannerCard, { backgroundColor: colors.primary }]}>
           <Text style={styles.arabicLogo}>بُنْيَان</Text>
-          <Text style={styles.bannerTitle}>The Bunyan Initiative</Text>
-          <Text style={styles.bannerSubtitle}>A Digital Fortress for Authentic Islamic Knowledge</Text>
+          <Text style={styles.bannerTitle}>{t.about.bannerTitle}</Text>
+          <Text style={styles.bannerSubtitle}>{t.about.bannerSubtitle}</Text>
         </View>
 
         {/* Section 1: The Sheikh & Dua */}
@@ -54,26 +55,25 @@ export default function AboutScreen() {
             </View>
             <View style={styles.headerTextGroup}>
               <Text style={[styles.cardTitle, { color: colors.text, fontSize: fonts.lg }]}>
-                Dua & Tribute for the Sheikh
+                {t.about.sheikhTitle}
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                ادْعُوا لِلشَّيْخِ وَارْحَمْهُ
+                {t.about.sheikhSubtitle}
               </Text>
             </View>
           </View>
 
           <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md }]}>
-            This application is built with deep gratitude to deliver the noble, authentic teachings of the Sheikh.
-            Every lecture, series, and lesson has been carefully organized to benefit current and future generations of Muslims worldwide.
+            {t.about.sheikhBody}
           </Text>
 
           {/* Sincere Dua Box */}
           <View style={[styles.duaCard, { backgroundColor: isDark ? '#1E2D1F' : '#F1F8E9', borderColor: colors.primaryLight }]}>
             <Text style={[styles.duaArabic, { color: isDark ? '#A5D6A7' : '#1B5E20' }]}>
-              اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ، وَعَافِهِ وَاعْفُ عَنْهُ، وَأَكْرِمْ نُزُلَهُ، وَوَسِّعْ مُدْخَلَهُ، وَاجْعَلْ عِلْمَهُ صَدَقَةً جَارِيَةً تَنْفَعُهُ إِلَى يَوْمِ الدِّينِ
+              {t.about.duaText}
             </Text>
             <Text style={[styles.duaTranslation, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-              "O Allah! Forgive him, have mercy upon him, grant him well-being, make his final abode honorable, and let his beneficial knowledge be an ongoing charity (Sadaqah Jariyah) benefiting him until the Day of Judgment."
+              {t.about.duaTranslation}
             </Text>
 
             <TouchableOpacity
@@ -87,7 +87,7 @@ export default function AboutScreen() {
                 color={prayed ? '#D32F2F' : '#1B5E20'}
               />
               <Text style={[styles.prayButtonText, prayed && styles.prayButtonTextActive]}>
-                {prayed ? 'Ameen · جَزَاكَ ٱللَّٰهُ خَيْرًا' : 'Say Ameen for the Sheikh'}
+                {prayed ? t.about.ameenDone : t.about.sayAmeen}
               </Text>
             </TouchableOpacity>
           </View>
@@ -101,20 +101,20 @@ export default function AboutScreen() {
             </View>
             <View style={styles.headerTextGroup}>
               <Text style={[styles.cardTitle, { color: colors.text, fontSize: fonts.lg }]}>
-                The Courses & Curricula
+                {t.about.curriculaTitle}
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                مَنَاهِجُ الدِّرَاسَةِ وَالعِلْمِ
+                {t.about.curriculaSubtitle}
               </Text>
             </View>
           </View>
 
           <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md }]}>
-            The Prophet ﷺ said: <Text style={{ fontStyle: 'italic', fontWeight: '600' }}>"Whoever treads a path seeking sacred knowledge, Allah makes easy for him a path to Paradise."</Text> (Sahih Muslim)
+            <Text style={{ fontStyle: 'italic', fontWeight: '600' }}>{t.about.hadithKnowledgeQuote}</Text> {t.about.hadithKnowledgeSource}
           </Text>
 
           <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md, marginTop: 4 }]}>
-            Our curriculum features organized modular series across Aqeedah, Tafsir, Hadith, Fiqh, Seerah, and Arabic. Lessons are arranged from foundational primers to advanced studies.
+            {t.about.curriculaBody}
           </Text>
 
           {/* Features List */}
@@ -122,21 +122,24 @@ export default function AboutScreen() {
             <View style={styles.pillarRow}>
               <Ionicons name="checkmark-circle" size={18} color="#0D47A1" />
               <Text style={[styles.pillarText, { color: colors.text }]}>
-                <Text style={{ fontWeight: '700' }}>Structured Curricula:</Text> Clear progression across the core Islamic disciplines.
+                <Text style={{ fontWeight: '700' }}>{t.about.pillarCurricula} </Text>
+                {t.about.pillarCurriculaDesc}
               </Text>
             </View>
 
             <View style={styles.pillarRow}>
               <Ionicons name="checkmark-circle" size={18} color="#0D47A1" />
               <Text style={[styles.pillarText, { color: colors.text }]}>
-                <Text style={{ fontWeight: '700' }}>Offline-First:</Text> Download audio and video to study anytime, anywhere without data costs.
+                <Text style={{ fontWeight: '700' }}>{t.about.pillarOffline} </Text>
+                {t.about.pillarOfflineDesc}
               </Text>
             </View>
 
             <View style={styles.pillarRow}>
               <Ionicons name="checkmark-circle" size={18} color="#0D47A1" />
               <Text style={[styles.pillarText, { color: colors.text }]}>
-                <Text style={{ fontWeight: '700' }}>Smart Resume:</Text> Automatically remembers your playback position across lessons.
+                <Text style={{ fontWeight: '700' }}>{t.about.pillarResume} </Text>
+                {t.about.pillarResumeDesc}
               </Text>
             </View>
           </View>
@@ -150,20 +153,20 @@ export default function AboutScreen() {
             </View>
             <View style={styles.headerTextGroup}>
               <Text style={[styles.cardTitle, { color: colors.text, fontSize: fonts.lg }]}>
-                The Bunyan Initiative
+                {t.about.bunyanTitle}
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا
+                {t.about.bunyanSubtitle}
               </Text>
             </View>
           </View>
 
           <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md }]}>
-            The Prophet ﷺ said: <Text style={{ fontStyle: 'italic', fontWeight: '600' }}>"The believer to another believer is like a solid building, each part strengthening the other."</Text> (Bukhari & Muslim)
+            <Text style={{ fontStyle: 'italic', fontWeight: '600' }}>{t.about.hadithBunyanQuote}</Text> {t.about.hadithBunyanSource}
           </Text>
 
           <Text style={[styles.cardBody, { color: colors.textSecondary, fontSize: fonts.md, marginTop: 4 }]}>
-            Bunyan is an independent non-profit initiative created as a perpetual endowment (Waqf) and continuous charity (Sadaqah Jariyah). It is 100% free with zero ads, subscriptions, or paywalls.
+            {t.about.bunyanBody}
           </Text>
 
           <TouchableOpacity
@@ -172,7 +175,7 @@ export default function AboutScreen() {
             activeOpacity={0.8}
           >
             <Ionicons name="share-social-outline" size={18} color="#FFFFFF" />
-            <Text style={styles.shareBtnText}>Share Bunyan & Earn Sadaqah</Text>
+            <Text style={styles.shareBtnText}>{t.about.shareBtn}</Text>
           </TouchableOpacity>
         </View>
 
@@ -184,7 +187,7 @@ export default function AboutScreen() {
         >
           <Ionicons name="refresh-outline" size={18} color={colors.primary} />
           <Text style={[styles.replayBtnText, { color: colors.primary }]}>
-            Open 3-Page Welcome Walkthrough (Sheikhs, Courses, Bunyan)
+            {t.about.walkthroughBtn}
           </Text>
         </TouchableOpacity>
       </ScrollView>

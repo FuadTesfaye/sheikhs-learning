@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme, useScaledFont, useAudioPlayer } from '../../src/hooks';
+import { useTheme, useScaledFont, useAudioPlayer, useTranslation } from '../../src/hooks';
 import { getLessonById, getCourseById, getLessonsByCourse } from '../../src/data/mockData';
 import { useLearningStore, useDownloadStore } from '../../src/store';
 import { DownloadService } from '../../src/services/downloadService';
@@ -30,6 +30,7 @@ export default function LessonScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const fonts = useScaledFont();
+  const { t, isRTL } = useTranslation();
 
   const lesson = getLessonById(id);
   const course = lesson ? getCourseById(lesson.courseId) : undefined;
@@ -123,23 +124,23 @@ export default function LessonScreen() {
 
   const handleDownloadAudio = () => {
     if (isAudioDownloaded) {
-      Alert.alert('Downloaded', 'Audio is already downloaded for offline playback.');
+      Alert.alert(t.lesson.audioSaved, t.lesson.audioSaved);
       return;
     }
     if (lesson) {
       DownloadService.downloadLesson(lesson, 'audio');
-      Alert.alert('Download Started', 'Audio is downloading from Cloudflare storage.');
+      Alert.alert(t.downloads.status.downloading, t.lesson.audioDownloading);
     }
   };
 
   const handleDownloadPdf = () => {
     if (isPdfDownloaded) {
-      Alert.alert('Downloaded', 'PDF study text is already saved.');
+      Alert.alert(t.lesson.pdfSaved, t.lesson.pdfSaved);
       return;
     }
     if (lesson && lesson.pdfUrl) {
       DownloadService.downloadLesson(lesson, 'pdf');
-      Alert.alert('Download Started', 'PDF study text is downloading.');
+      Alert.alert(t.downloads.status.downloading, t.lesson.pdfDownloading);
     }
   };
 
@@ -148,7 +149,7 @@ export default function LessonScreen() {
     try {
       await Share.share({
         title: lesson.title,
-        message: `Listen to "${lesson.title}" from "${course?.title || "Sheikh's Lessons"}" on Bunyan!`,
+        message: `${lesson.title} - ${course?.title || 'Bunyan'}`,
       });
     } catch {}
   };
@@ -165,7 +166,7 @@ export default function LessonScreen() {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={{ color: colors.text, textAlign: 'center', marginTop: 100 }}>
-          Lesson not found
+          {t.lesson.notFound}
         </Text>
       </View>
     );
@@ -175,10 +176,10 @@ export default function LessonScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen
         options={{
-          headerTitle: course?.title || 'Lesson',
+          headerTitle: course?.title || lesson.title,
           headerStyle: { backgroundColor: colors.surface },
           headerTintColor: colors.text,
-          headerBackTitle: 'Back',
+          headerBackTitle: t.common.back,
         }}
       />
 
@@ -194,7 +195,7 @@ export default function LessonScreen() {
               {course?.title || 'Course'}
             </Text>
             <Text style={[styles.lessonOrder, { color: colors.textSecondary }]}>
-              Lesson {lesson.order} of {courseLessons.length || course?.totalLessons}
+              {t.lesson.orderInfo(lesson.order, courseLessons.length || course?.totalLessons || 1)}
             </Text>
           </View>
           <Text style={[styles.lessonTitle, { color: colors.text, fontSize: fonts.xl }]}>
@@ -221,7 +222,7 @@ export default function LessonScreen() {
                   { color: activeTab === 'pdf' ? colors.text : colors.textSecondary },
                 ]}
               >
-                PDF Study Text (Default)
+                {t.lesson.pdfTab}
               </Text>
             </TouchableOpacity>
 
@@ -241,7 +242,7 @@ export default function LessonScreen() {
                   { color: activeTab === 'notes' ? colors.text : colors.textSecondary },
                 ]}
               >
-                Overview & Notes
+                {t.lesson.notesTab}
               </Text>
             </TouchableOpacity>
           </View>
@@ -268,7 +269,7 @@ export default function LessonScreen() {
                 <Ionicons name="book-outline" size={20} color={colors.primary} />
               </View>
               <Text style={[styles.cardTitle, { color: colors.text, fontSize: fonts.md }]}>
-                Lesson Summary & Commentary
+                {t.lesson.summaryHeader}
               </Text>
             </View>
 
@@ -284,7 +285,7 @@ export default function LessonScreen() {
               >
                 <Ionicons name="document-text-outline" size={18} color={colors.primary} />
                 <Text style={[styles.pdfNoticeText, { color: colors.primary }]}>
-                  This lesson has accompanying PDF notes. Tap to view study text.
+                  {t.lesson.pdfNoticeText}
                 </Text>
               </TouchableOpacity>
             )}
@@ -292,7 +293,7 @@ export default function LessonScreen() {
             {lesson.transcriptText && (
               <View style={{ marginTop: Spacing.md }}>
                 <Text style={[styles.sectionSubtitle, { color: colors.text }]}>
-                  Study Notes
+                  {t.lesson.studyNotesHeader}
                 </Text>
                 <Text style={[styles.transcriptText, { color: colors.textSecondary, fontSize: fonts.sm }]}>
                   {lesson.transcriptText}
@@ -314,7 +315,7 @@ export default function LessonScreen() {
               color={isAudioDownloaded ? colors.success : colors.text}
             />
             <Text style={[styles.actionBtnText, { color: isAudioDownloaded ? colors.success : colors.text }]}>
-              {isAudioDownloaded ? 'Audio Saved' : isAudioDownloading ? 'Downloading...' : 'Download Audio'}
+              {isAudioDownloaded ? t.lesson.audioSaved : isAudioDownloading ? t.lesson.audioDownloading : t.lesson.downloadAudio}
             </Text>
           </TouchableOpacity>
 
@@ -329,7 +330,7 @@ export default function LessonScreen() {
                 color={isPdfDownloaded ? colors.success : colors.text}
               />
               <Text style={[styles.actionBtnText, { color: isPdfDownloaded ? colors.success : colors.text }]}>
-                {isPdfDownloaded ? 'PDF Saved' : isPdfDownloading ? 'Downloading...' : 'Download PDF'}
+                {isPdfDownloaded ? t.lesson.pdfSaved : isPdfDownloading ? t.lesson.pdfDownloading : t.lesson.downloadPdf}
               </Text>
             </TouchableOpacity>
           )}
@@ -339,7 +340,7 @@ export default function LessonScreen() {
             onPress={handleShare}
           >
             <Ionicons name="share-outline" size={18} color={colors.text} />
-            <Text style={[styles.actionBtnText, { color: colors.text }]}>Share</Text>
+            <Text style={[styles.actionBtnText, { color: colors.text }]}>{t.common.share}</Text>
           </TouchableOpacity>
         </View>
 
@@ -352,7 +353,7 @@ export default function LessonScreen() {
             >
               <Ionicons name="chevron-back" size={18} color={colors.text} />
               <Text style={[styles.navBtnText, { color: colors.text }]} numberOfLines={1}>
-                Previous: Lesson {prevLesson.order}
+                {t.lesson.prevLesson(prevLesson.order)}
               </Text>
             </TouchableOpacity>
           ) : (
@@ -365,7 +366,7 @@ export default function LessonScreen() {
               onPress={() => router.replace(`/lesson/${nextLesson.id}`)}
             >
               <Text style={[styles.navBtnText, { color: colors.text }]} numberOfLines={1}>
-                Next: Lesson {nextLesson.order}
+                {t.lesson.nextLesson(nextLesson.order)}
               </Text>
               <Ionicons name="chevron-forward" size={18} color={colors.text} />
             </TouchableOpacity>
@@ -407,7 +408,7 @@ export default function LessonScreen() {
               <View style={styles.streamingBadgeRow}>
                 <View style={[styles.liveDot, { backgroundColor: colors.primary }]} />
                 <Text style={[styles.miniSourceText, { color: colors.textSecondary }]}>
-                  {isAudioDownloaded ? 'Offline Storage' : 'Cloudflare R2 Audio'}
+                  {isAudioDownloaded ? t.lesson.offlineSource : t.lesson.onlineSource}
                 </Text>
               </View>
             </View>

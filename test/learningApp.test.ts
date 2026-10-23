@@ -257,4 +257,54 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     expect(SeekableProgressBar).toBeDefined();
     expect(KitabCover).toBeDefined();
   });
+
+  it('validates comprehensive 4-language multilingual translations (ar, en, am, om)', async () => {
+    const { translations, getWelcomeSlides } = await import('../src/i18n');
+    const { useSettingsStore } = await import('../src/store');
+
+    const supportedLangs = ['ar', 'en', 'am', 'om'] as const;
+
+    supportedLangs.forEach(lang => {
+      const dict = translations[lang];
+      expect(dict).toBeDefined();
+
+      // Check Tabs
+      expect(dict.tabs.home).toBeTruthy();
+      expect(dict.tabs.search).toBeTruthy();
+      expect(dict.tabs.downloads).toBeTruthy();
+      expect(dict.tabs.bookmarks).toBeTruthy();
+      expect(dict.tabs.settings).toBeTruthy();
+
+      // Check Course & Lesson
+      expect(dict.course.downloadAll).toBeTruthy();
+      expect(dict.course.lessonsHeader).toBeTruthy();
+      expect(dict.lesson.pdfTab).toBeTruthy();
+      expect(dict.lesson.notesTab).toBeTruthy();
+
+      // Check PdfViewer & About
+      expect(dict.pdfViewer.badge).toBeTruthy();
+      expect(dict.about.bannerTitle).toBeTruthy();
+      expect(dict.about.sheikhTitle).toBeTruthy();
+
+      // Check Welcome Slides for each language
+      const slides = getWelcomeSlides(lang);
+      expect(slides.length).toBe(3);
+      expect(slides[0].id).toBe('sheikhs');
+      expect(slides[1].id).toBe('courses');
+      expect(slides[2].id).toBe('bunyan');
+      expect(slides[0].badge).toBeTruthy();
+      expect(slides[1].badge).toBeTruthy();
+      expect(slides[2].badge).toBeTruthy();
+    });
+
+    // Verify settings store language switcher
+    useSettingsStore.getState().setLanguage('am');
+    expect(useSettingsStore.getState().language).toBe('am');
+
+    useSettingsStore.getState().setLanguage('om');
+    expect(useSettingsStore.getState().language).toBe('om');
+
+    useSettingsStore.getState().setLanguage('ar');
+    expect(useSettingsStore.getState().language).toBe('ar');
+  });
 });

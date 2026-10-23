@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme, useScaledFont } from '../../src/hooks';
+import { useTheme, useScaledFont, useTranslation } from '../../src/hooks';
 import { getCourseById, getLessonsByCourse } from '../../src/data/mockData';
 import { useLearningStore, useDownloadStore } from '../../src/store';
 import { LessonRow, ProgressBar, EmptyState, KitabCover } from '../../src/components';
@@ -14,6 +14,7 @@ export default function CourseScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
   const fonts = useScaledFont();
+  const { t, isRTL } = useTranslation();
   const router = useRouter();
 
   const course = useMemo(() => getCourseById(id), [id]);
@@ -49,20 +50,20 @@ export default function CourseScreen() {
 
   const handleDownloadAll = () => {
     if (downloadableLessons.length === 0) {
-      Alert.alert('تنبيه', 'التسجيلات الصوتية لهذا المتن قيد التسجيل والإعداد حالياً، وسيتم إتاحتها قريباً بإذن الله.');
+      Alert.alert(t.course.alertNoticeTitle, t.course.prepNotice);
       return;
     }
 
     Alert.alert(
-      'تحميل جميع الدروس',
-      `هل ترغب في تحميل ${downloadableLessons.length} درساً للاستماع دون اتصال؟`,
+      t.course.downloadAll,
+      t.course.downloadAllPrompt(downloadableLessons.length),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t.common.cancel, style: 'cancel' },
         {
-          text: 'تحميل الكل',
+          text: t.common.download,
           onPress: () => {
             DownloadService.downloadCourse(downloadableLessons);
-            Alert.alert('بدأ التحميل', `جاري تحميل ${downloadableLessons.length} درساً في الخلفية. يمكنك متابعة التقدم في تبويب التحميلات.`);
+            Alert.alert(t.course.downloadsStartedTitle, t.course.downloadsStartedMsg(downloadableLessons.length));
           },
         },
       ]
@@ -72,7 +73,7 @@ export default function CourseScreen() {
   if (!course) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <EmptyState icon="alert-circle-outline" title="الكتاب غير موجود" subtitle="ربما تم نقل هذا الكتاب أو تعديل مساره." />
+        <EmptyState icon="alert-circle-outline" title={t.course.notFoundTitle} subtitle={t.course.notFoundDesc} />
       </View>
     );
   }
@@ -128,13 +129,13 @@ export default function CourseScreen() {
                   <View style={[styles.metaBadge, { backgroundColor: colors.surfaceVariant }]}>
                     <Ionicons name="school-outline" size={13} color={colors.textSecondary} />
                     <Text style={[styles.metaText, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                      {course.level === 'Beginner' ? 'مبتدئ' : course.level === 'Intermediate' ? 'متوسط' : 'متقدم'}
+                      {t.course.level[course.level as keyof typeof t.course.level] || course.level}
                     </Text>
                   </View>
                   <View style={[styles.metaBadge, { backgroundColor: colors.surfaceVariant }]}>
                     <Ionicons name="play-circle-outline" size={13} color={colors.textSecondary} />
                     <Text style={[styles.metaText, { color: colors.textSecondary, fontSize: fonts.xs }]}>
-                      {course.totalLessons} {course.totalLessons <= 10 ? 'دروس' : 'درساً'}
+                      {t.common.lessonsCount(course.totalLessons)}
                     </Text>
                   </View>
                 </View>
@@ -158,24 +159,24 @@ export default function CourseScreen() {
                 activeOpacity={0.8}
               >
                 <Ionicons name="cloud-download-outline" size={20} color="#fff" />
-                <Text style={styles.downloadAllText}>تحميل جميع الدروس المتاحة</Text>
+                <Text style={styles.downloadAllText}>{t.course.downloadAll}</Text>
               </TouchableOpacity>
             ) : (
               <View style={[styles.prepNoticeBox, { backgroundColor: colors.primaryLight + '12', borderColor: colors.primaryLight + '30' }]}>
                 <Ionicons name="information-circle-outline" size={18} color={colors.primary} />
                 <Text style={[styles.prepNoticeText, { color: colors.text }]}>
-                  المنهج الدراسي معتمد ومكتمل. التسجيلات الصوتية قيد الإعداد والمراجعة.
+                  {t.course.prepNotice}
                 </Text>
               </View>
             )}
 
             <Text style={[styles.lessonsHeader, { color: colors.text, fontSize: fonts.lg }]}>
-              فهرس الأبواب والدروس
+              {t.course.lessonsHeader}
             </Text>
           </View>
         }
         ListEmptyComponent={
-          <EmptyState icon="list-outline" title="لا توجد دروس حالياً" subtitle="سيتم إضافة الفهرس قريباً بإذن الله." />
+          <EmptyState icon="list-outline" title={t.course.noLessonsTitle} subtitle={t.course.noLessonsDesc} />
         }
       />
     </View>

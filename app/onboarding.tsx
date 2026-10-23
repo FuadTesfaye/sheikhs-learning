@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,21 +15,25 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSettingsStore } from '../src/store';
-import { useTheme } from '../src/hooks';
+import { useTheme, useTranslation } from '../src/hooks';
 import { Spacing, BorderRadius, FontSize } from '../src/theme';
-import { welcomeSlides, WelcomeSlide } from '../src/data/welcomeData';
+import { getWelcomeSlides, WelcomeSlide } from '../src/data/welcomeData';
 
 export default function OnboardingScreen() {
   const { width } = useWindowDimensions();
   const { colors, isDark } = useTheme();
+  const { t, isRTL } = useTranslation();
+  const language = useSettingsStore(s => s.language);
+  const slides = useMemo(() => getWelcomeSlides(language), [language]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [prayed, setPrayed] = useState(false);
   const flatListRef = useRef<FlatList<WelcomeSlide>>(null);
   const router = useRouter();
   const setOnboardingCompleted = useSettingsStore(s => s.setOnboardingCompleted);
 
-  const totalSlides = welcomeSlides.length;
-  const currentSlide = welcomeSlides[currentIndex] || welcomeSlides[0];
+  const totalSlides = slides.length;
+  const currentSlide = slides[currentIndex] || slides[0];
 
   const handleNext = () => {
     if (currentIndex < totalSlides - 1) {
@@ -200,7 +204,7 @@ export default function OnboardingScreen() {
             <View style={styles.specialBoxHeader}>
               <Ionicons name="library-outline" size={18} color="#0288D1" />
               <Text style={[styles.specialBoxTag, { color: '#0288D1' }]}>
-                Core Sciences in Curriculum
+                {language === 'ar' ? 'العلوم الشرعية الأساسية في المنهج' : language === 'am' ? 'በስርዓተ-ትምህርቱ ውስጥ የተካተቱ ዋና ሳይንሶች' : language === 'om' ? "Barnoota Bu'uuraa Kharrii Keessatti" : 'Core Sciences in Curriculum'}
               </Text>
             </View>
             <View style={styles.categoryPillsGrid}>
@@ -242,7 +246,7 @@ export default function OnboardingScreen() {
             <View style={styles.specialBoxHeader}>
               <Ionicons name="sparkles-outline" size={18} color="#E65100" />
               <Text style={[styles.specialBoxTag, { color: '#BF360C' }]}>
-                Foundation of Bunyan
+                {language === 'ar' ? 'أركان وركائز مبادرة بنيان' : language === 'am' ? 'የቡንያን መሰረታዊ ምሶሶዎች' : language === 'om' ? "Bu'uuraalee Masaraa Bunyaan" : 'Foundation of Bunyan'}
               </Text>
             </View>
             <View style={styles.pillarsContainer}>
@@ -316,7 +320,7 @@ export default function OnboardingScreen() {
           <Text style={[styles.brandTitle, { color: currentSlide.highlightColor }]}>بُنْيَان</Text>
           <View style={[styles.stepCapsule, { backgroundColor: isDark ? colors.surfaceVariant : '#EEEEEE' }]}>
             <Text style={[styles.stepText, { color: colors.textSecondary }]}>
-              {currentIndex + 1} of {totalSlides}
+              {currentIndex + 1} / {totalSlides}
             </Text>
           </View>
         </View>
@@ -327,15 +331,15 @@ export default function OnboardingScreen() {
           activeOpacity={0.7}
           accessibilityLabel="Skip onboarding and go to lessons"
         >
-          <Text style={[styles.skipText, { color: colors.textSecondary }]}>Skip to Courses</Text>
-          <Ionicons name="chevron-forward" size={14} color={colors.textSecondary} />
+          <Text style={[styles.skipText, { color: colors.textSecondary }]}>{t.onboarding.skip}</Text>
+          <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={14} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
       {/* Main Slide Carousel */}
       <FlatList
         ref={flatListRef}
-        data={welcomeSlides}
+        data={slides}
         renderItem={renderSlide}
         horizontal
         pagingEnabled
@@ -367,7 +371,7 @@ export default function OnboardingScreen() {
       >
         {/* Interactive Dots */}
         <View style={styles.dotsRow}>
-          {welcomeSlides.map((s, i) => {
+          {slides.map((s, i) => {
             const isActive = i === currentIndex;
             return (
               <TouchableOpacity
@@ -402,8 +406,8 @@ export default function OnboardingScreen() {
               activeOpacity={0.7}
               accessibilityLabel="Go back to previous slide"
             >
-              <Ionicons name="arrow-back" size={18} color={colors.text} />
-              <Text style={[styles.backBtnText, { color: colors.text }]}>Back</Text>
+              <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={18} color={colors.text} />
+              <Text style={[styles.backBtnText, { color: colors.text }]}>{t.onboarding.back}</Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.backBtnSpacer} />
@@ -421,11 +425,11 @@ export default function OnboardingScreen() {
           >
             <Text style={styles.actionBtnText}>
               {currentIndex === totalSlides - 1
-                ? 'Start Seeking Knowledge'
+                ? t.onboarding.btnStart
                 : currentSlide.nextStepTitle}
             </Text>
             <Ionicons
-              name={currentIndex === totalSlides - 1 ? 'checkmark-circle-outline' : 'arrow-forward'}
+              name={currentIndex === totalSlides - 1 ? 'checkmark-circle-outline' : isRTL ? 'arrow-back' : 'arrow-forward'}
               size={20}
               color="#FFFFFF"
             />
