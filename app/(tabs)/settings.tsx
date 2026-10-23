@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Switch, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme, useScaledFont } from '../../src/hooks';
+import { useTheme, useScaledFont, useTranslation } from '../../src/hooks';
 import { useSettingsStore, useLearningStore, useDownloadStore } from '../../src/store';
 import { Spacing, BorderRadius } from '../../src/theme';
-import { ThemeMode, TextSize } from '../../src/types';
+import { ThemeMode, TextSize, SupportedLanguage } from '../../src/types';
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -20,6 +20,8 @@ export default function SettingsScreen() {
   const { colors, isDark } = useTheme();
   const fonts = useScaledFont();
   const router = useRouter();
+  const { t, language, setLanguage, isRTL } = useTranslation();
+
   const theme = useSettingsStore(s => s.theme);
   const textSize = useSettingsStore(s => s.textSize);
   const setTheme = useSettingsStore(s => s.setTheme);
@@ -52,36 +54,43 @@ export default function SettingsScreen() {
     };
   }, [rawDownloads]);
 
+  const languagesList: { label: string; value: SupportedLanguage }[] = [
+    { label: t.settings.languages.ar, value: 'ar' },
+    { label: t.settings.languages.en, value: 'en' },
+    { label: t.settings.languages.am, value: 'am' },
+    { label: t.settings.languages.om, value: 'om' },
+  ];
+
   const themes: { label: string; value: ThemeMode }[] = [
-    { label: 'Light', value: 'light' },
-    { label: 'Dark', value: 'dark' },
-    { label: 'System', value: 'system' },
+    { label: t.settings.themeModes.light, value: 'light' },
+    { label: t.settings.themeModes.dark, value: 'dark' },
+    { label: t.settings.themeModes.system, value: 'system' },
   ];
 
   const textSizes: { label: string; value: TextSize }[] = [
-    { label: 'Small', value: 'small' },
-    { label: 'Medium', value: 'medium' },
-    { label: 'Large', value: 'large' },
+    { label: t.settings.textSizes.small, value: 'small' },
+    { label: t.settings.textSizes.medium, value: 'medium' },
+    { label: t.settings.textSizes.large, value: 'large' },
   ];
 
   const handleClearCache = async () => {
     await clearCacheOnly();
-    Alert.alert('تم مسح الذاكرة المؤقتة', 'تم تفريغ الملفات المؤقتة بنجاح مع الحفاظ الكامل على كتبك ودروسك المحفوظة دون اتصال.');
+    Alert.alert(t.settings.clearCacheSuccessTitle, t.settings.clearCacheSuccessDesc);
   };
 
   const handleClearData = () => {
     Alert.alert(
-      'Clear All Data',
-      'This will reset all progress, bookmarks, and downloads. This action cannot be undone.',
+      t.settings.clearDataConfirmTitle,
+      t.settings.clearDataConfirmDesc,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t.common.cancel, style: 'cancel' },
         {
-          text: 'Clear All',
+          text: t.common.clearAll,
           style: 'destructive',
           onPress: () => {
             clearLearning();
             clearDownloads();
-            Alert.alert('Done', 'All data has been cleared.');
+            Alert.alert(t.common.done, t.settings.clearAllData);
           },
         },
       ]
@@ -97,34 +106,87 @@ export default function SettingsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl }]}>Settings</Text>
+          <Text style={[styles.title, { color: colors.text, fontSize: fonts.xxl, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.settings.title}
+          </Text>
+        </View>
+
+        {/* Language Selection */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.settings.language}
+          </Text>
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.languageGrid}>
+              {languagesList.map(item => {
+                const isSelected = language === item.value;
+                return (
+                  <TouchableOpacity
+                    key={item.value}
+                    style={[
+                      styles.languageChip,
+                      {
+                        backgroundColor: isSelected ? colors.primary : colors.surfaceVariant,
+                        borderColor: isSelected ? colors.primary : colors.border,
+                      },
+                    ]}
+                    onPress={() => setLanguage(item.value)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons
+                      name={isSelected ? 'checkmark-circle' : 'globe-outline'}
+                      size={16}
+                      color={isSelected ? '#fff' : colors.textSecondary}
+                    />
+                    <Text
+                      style={[
+                        styles.chipText,
+                        {
+                          color: isSelected ? '#fff' : colors.text,
+                          fontSize: fonts.sm,
+                        },
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
         </View>
 
         {/* Theme */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm }]}>APPEARANCE</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.settings.appearance}
+          </Text>
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.label, { color: colors.text, fontSize: fonts.md }]}>Theme</Text>
+            <Text style={[styles.label, { color: colors.text, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+              {t.settings.theme}
+            </Text>
             <View style={styles.optionRow}>
-              {themes.map(t => (
+              {themes.map(item => (
                 <TouchableOpacity
-                  key={t.value}
+                  key={item.value}
                   style={[
                     styles.chip,
                     {
-                      backgroundColor: theme === t.value ? colors.primary : colors.surfaceVariant,
+                      backgroundColor: theme === item.value ? colors.primary : colors.surfaceVariant,
                     },
                   ]}
-                  onPress={() => setTheme(t.value)}
+                  onPress={() => setTheme(item.value)}
                 >
-                  <Text style={[
-                    styles.chipText,
-                    {
-                      color: theme === t.value ? '#fff' : colors.text,
-                      fontSize: fonts.sm,
-                    },
-                  ]}>
-                    {t.label}
+                  <Text
+                    style={[
+                      styles.chipText,
+                      {
+                        color: theme === item.value ? '#fff' : colors.text,
+                        fontSize: fonts.sm,
+                      },
+                    ]}
+                  >
+                    {item.label}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -134,61 +196,69 @@ export default function SettingsScreen() {
 
         {/* Text Size */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm }]}>TEXT SIZE</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.settings.textSize}
+          </Text>
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.label, { color: colors.text, fontSize: fonts.md }]}>Font Size</Text>
+            <Text style={[styles.label, { color: colors.text, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+              {t.settings.textSize}
+            </Text>
             <View style={styles.optionRow}>
-              {textSizes.map(s => (
+              {textSizes.map(item => (
                 <TouchableOpacity
-                  key={s.value}
+                  key={item.value}
                   style={[
                     styles.chip,
                     {
-                      backgroundColor: textSize === s.value ? colors.primary : colors.surfaceVariant,
+                      backgroundColor: textSize === item.value ? colors.primary : colors.surfaceVariant,
                     },
                   ]}
-                  onPress={() => setTextSize(s.value)}
+                  onPress={() => setTextSize(item.value)}
                 >
-                  <Text style={[
-                    styles.chipText,
-                    {
-                      color: textSize === s.value ? '#fff' : colors.text,
-                      fontSize: fonts.sm,
-                    },
-                  ]}>
-                    {s.label}
+                  <Text
+                    style={[
+                      styles.chipText,
+                      {
+                        color: textSize === item.value ? '#fff' : colors.text,
+                        fontSize: fonts.sm,
+                      },
+                    ]}
+                  >
+                    {item.label}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
-            <Text style={[styles.previewText, { color: colors.textSecondary, fontSize: fonts.md }]}>
-              This is a preview of the current text size. Adjust to your preference.
+            <Text style={[styles.previewText, { color: colors.textSecondary, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+              {t.settings.previewText}
             </Text>
           </View>
         </View>
 
         {/* Storage & Cache Management */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm }]}>STORAGE & CACHE (إدارة المساحة والذاكرة)</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.settings.storage}
+          </Text>
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>الدروس الصوتية المحفوظة (Audio)</Text>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>{t.settings.audioStorage}</Text>
               <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>
                 {formatBytes(storageBreakdown.audioBytes)}
               </Text>
             </View>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>الكتب ومتون الدراسة (PDF)</Text>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>{t.settings.pdfStorage}</Text>
               <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>
                 {formatBytes(storageBreakdown.pdfBytes)}
               </Text>
             </View>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm, fontWeight: '700' }]}>إجمالي المساحة المستخدمة</Text>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm, fontWeight: '700' }]}>{t.settings.totalStorage}</Text>
               <Text style={[styles.aboutValue, { color: colors.primary, fontSize: fonts.sm, fontWeight: '700' }]}>
-                {formatBytes(storageBreakdown.totalBytes)} ({storageBreakdown.completedCount} ملفات)
+                {formatBytes(storageBreakdown.totalBytes)} ({storageBreakdown.completedCount})
               </Text>
             </View>
 
@@ -201,65 +271,77 @@ export default function SettingsScreen() {
             >
               <Ionicons name="sparkles-outline" size={18} color={colors.primary} />
               <Text style={[styles.storageActionText, { color: colors.text, fontSize: fonts.sm }]}>
-                تنظيف الذاكرة المؤقتة (Clear Temp Cache)
+                {t.settings.clearCacheBtn}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Actions */}
+        {/* General */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm }]}>GENERAL</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.settings.general}
+          </Text>
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <TouchableOpacity style={styles.menuRow} onPress={() => router.push('/about')}>
               <Ionicons name="heart-circle-outline" size={22} color="#1B5E20" />
-              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md }]}>About (Sheikhs, Courses & Bunyan)</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+                {t.settings.aboutMenu}
+              </Text>
+              <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.textTertiary} />
             </TouchableOpacity>
 
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
             <TouchableOpacity style={styles.menuRow} onPress={() => router.push('/admin')}>
               <Ionicons name="shield-checkmark-outline" size={22} color={colors.primary} />
-              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md }]}>Admin Analytics Portal</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+                {t.settings.adminMenu}
+              </Text>
+              <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.textTertiary} />
             </TouchableOpacity>
 
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
             <TouchableOpacity style={styles.menuRow} onPress={handleReplayOnboarding}>
               <Ionicons name="refresh-outline" size={22} color={colors.text} />
-              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md }]}>Welcome Walkthrough (3 Pages)</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+              <Text style={[styles.menuText, { color: colors.text, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+                {t.settings.walkthroughMenu}
+              </Text>
+              <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.textTertiary} />
             </TouchableOpacity>
 
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
             <TouchableOpacity style={styles.menuRow} onPress={handleClearData}>
               <Ionicons name="trash-outline" size={22} color={colors.error} />
-              <Text style={[styles.menuText, { color: colors.error, fontSize: fonts.md }]}>Clear All Data</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+              <Text style={[styles.menuText, { color: colors.error, fontSize: fonts.md, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+                {t.settings.clearAllData}
+              </Text>
+              <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.textTertiary} />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* About */}
+        {/* About Info */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm }]}>ABOUT</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fonts.sm, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t.settings.aboutSection}
+          </Text>
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>Version</Text>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>{t.settings.version}</Text>
               <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>1.0.0</Text>
             </View>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>Content</Text>
-              <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>100% Free & Ad-Free</Text>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>{t.settings.content}</Text>
+              <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>{t.settings.contentFree}</Text>
             </View>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.aboutRow}>
-              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>Privacy</Text>
-              <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>No data shared</Text>
+              <Text style={[styles.aboutLabel, { color: colors.textSecondary, fontSize: fonts.sm }]}>{t.settings.privacy}</Text>
+              <Text style={[styles.aboutValue, { color: colors.text, fontSize: fonts.sm }]}>{t.settings.privacyText}</Text>
             </View>
           </View>
         </View>
@@ -299,10 +381,25 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
   },
   label: { fontWeight: '600', marginBottom: Spacing.md },
+  languageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  languageChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+  },
   optionRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
     marginBottom: Spacing.md,
+    flexWrap: 'wrap',
   },
   chip: {
     paddingHorizontal: Spacing.lg,

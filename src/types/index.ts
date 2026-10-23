@@ -9,6 +9,7 @@ export type DownloadStatus =
   | 'failed';
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TextSize = 'small' | 'medium' | 'large';
+export type SupportedLanguage = 'ar' | 'en' | 'am' | 'om';
 
 export interface Category {
   id: string;
@@ -88,7 +89,7 @@ export interface Bookmark {
 export interface UserSettings {
   theme: ThemeMode;
   textSize: TextSize;
-  language: string;
+  language: SupportedLanguage;
   onboardingCompleted: boolean;
 }
 

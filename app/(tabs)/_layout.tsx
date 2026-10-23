@@ -4,12 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'react-native';
 import { Colors } from '../../src/theme';
 import { useSettingsStore } from '../../src/store';
+import { useTranslation } from '../../src/hooks';
 
 export default function TabLayout() {
   const systemScheme = useColorScheme();
   const themePref = useSettingsStore(s => s.theme);
   const isDark = themePref === 'system' ? systemScheme === 'dark' : themePref === 'dark';
   const colors = isDark ? Colors.dark : Colors.light;
+  const { t } = useTranslation();
 
   return (
     <Tabs
@@ -33,35 +35,35 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: t.tabs.home,
           tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Search',
+          title: t.tabs.search,
           tabBarIcon: ({ color, size }) => <Ionicons name="search-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="downloads"
         options={{
-          title: 'Downloads',
+          title: t.tabs.downloads,
           tabBarIcon: ({ color, size }) => <Ionicons name="cloud-download-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="bookmarks"
         options={{
-          title: 'Bookmarks',
+          title: t.tabs.bookmarks,
           tabBarIcon: ({ color, size }) => <Ionicons name="bookmark-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: t.tabs.settings,
           tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
         }}
       />

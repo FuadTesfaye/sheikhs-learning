@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ThemeMode, TextSize, UserSettings } from '../types';
+import { ThemeMode, TextSize, UserSettings, SupportedLanguage } from '../types';
 
 const SETTINGS_KEY = '@user_settings';
 
@@ -11,7 +11,7 @@ interface SettingsState extends UserSettings {
   loadSettings: () => Promise<void>;
   setTheme: (theme: ThemeMode) => void;
   setTextSize: (size: TextSize) => void;
-  setLanguage: (lang: string) => void;
+  setLanguage: (lang: SupportedLanguage) => void;
   setOnboardingCompleted: (completed: boolean) => void;
 }
 
@@ -24,7 +24,7 @@ const TEXT_SIZE_SCALES: Record<TextSize, number> = {
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   theme: 'system',
   textSize: 'medium',
-  language: 'en',
+  language: 'ar',
   onboardingCompleted: false,
   isLoaded: false,
   fontScale: 1.0,
