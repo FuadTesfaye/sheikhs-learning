@@ -18,59 +18,39 @@ type SearchResult = {
 
 const MULTILINGUAL_SEARCH_MAP: Record<string, string[]> = {
   'crs-1': [
-    'tawheed', 'tawhid', 'monotheism', 'aqeedah', 'kitab at-tawheed', 'muhammad ibn abd al-wahhab',
-    'ተወሂድ', 'አቂዳ', 'የተወሂድ ኪታብ', 'እምነት',
-    'tawhiida', 'aqiidaa', 'kitaaba tawhiidaa', 'waaqayyummaa',
+    'tawheed', 'tawhid', 'monotheism', 'aqeedah', 'kitab at-tawheed', 'fawzan', 'muhammad ibn abd al-wahhab',
+    'ተውሂድ', 'አቂዳ', 'ፈውዛን', 'ኪታቡ ተውሂድ', 'የተውሂድ ኪታብ', 'እምነት',
+    'tawhiida', 'aqiidaa', 'fawzaan', 'kitaaba tawhiidaa', 'waaqayyummaa',
   ],
   'crs-2': [
-    'usool', 'usul', 'thalatha', 'three principles', 'aqeedah',
-    'ኡሱል', 'ሶስቱ መሰረቶች', 'አቂዳ',
-    'usuula', 'bu\'uura sadan', 'aqiidaa',
+    'usool', 'usul', 'thalatha', 'three principles', 'aqeedah', 'fundamentals',
+    'ኡሱል', 'ሰላሰቱል ኡሱል', 'ሶስቱ መሰረቶች', 'አቂዳ',
+    'usuula', 'bu\'uura sadan', 'salaasatul usuul', 'aqiidaa',
   ],
   'crs-3': [
-    'qawaid', 'four principles', 'qawaid arbaa', 'aqeedah',
-    'ቀዋዒድ', 'አራቱ ህጎች', 'መርሆዎች',
-    'qawaa\'ida', 'qajeelfama afuran',
+    'qawaid', 'four principles', 'four rules', 'qawaid arbaa', 'aqeedah',
+    'ቀዋዒድ', 'አልቀዋዒዱል አርበዓ', 'አራቱ ህጎች', 'መርሆዎች', 'አቂዳ',
+    'qawaa\'ida', 'qajeelfama afuran', 'qawaa\'idul arba\'aa',
   ],
   'crs-4': [
-    'kashf', 'shubuhat', 'removal of doubts',
-    'ከሽፍ', 'ሹቡሃት', 'ጥርጣሬዎችን ማጥራት',
-    'kashfii', 'shakkiwwan saaxiluu',
+    'hadith', 'nawawi', '40 hadith', 'forty hadith', 'arbaeen', 'arbaun',
+    'ሐዲስ', 'ነወዊ', 'አርበዒን', 'አርባ ሐዲሶች', 'አርባኢን',
+    'hadiisa', 'nawawii', 'arba\'iin', 'hadiisa 40',
   ],
   'crs-5': [
-    'tafsir', 'fatiha', 'surah al-fatiha', 'quran', 'amma',
-    'ተፍሲር', 'ፋቲሃ', 'ቁርኣን', 'ጁዝእ አማ',
-    'tafsiira', 'faatihaa', 'qur\'aana',
+    'shuroot', 'conditions of prayer', 'salah', 'pillars of prayer', 'fiqh', 'prayer obligations',
+    'ሹሩጡ ሰላት', 'ሶላት', 'ሰላት', 'የሰላት መስፈርቶች', 'ፊቅህ', 'ኢባዳ',
+    'ulaagaalee salaataa', 'shuruuxu salaat', 'salaata', 'sagada', 'fiqhii',
   ],
   'crs-6': [
-    'hadith', 'nawawi', '40 hadith', 'forty hadith',
-    'ሐዲስ', 'ነወዊ', 'አርባኢን', 'አርባ ሐዲሶች',
-    'hadiisa', 'nawawii', 'hadiisa 40',
+    'safinah', 'safinat an-najah', 'ship of salvation', 'fiqh', 'taharah', 'worship',
+    'ሰፊና', 'ሰፊነቱ ነጃህ', 'የመዳኛ መርከብ', 'ፊቅህ', 'ጦሀራ', 'ሰላት',
+    'doonii nagaa', 'safiinaa', 'safiinatu najaah', 'fiqhii', 'qulqullina',
   ],
   'crs-7': [
-    'fiqh', 'salah', 'umdat al-fiqh', 'prayer', 'worship',
-    'ፊቅህ', 'ሶላት', 'ሰላት', 'ኡምደቱል ፊቅህ', 'ኢባዳ',
-    'fiqhii', 'salaata', 'sagada', 'ibaadaa',
-  ],
-  'crs-8': [
-    'seerah', 'prophet', 'life of the prophet', 'sirah',
-    'ሲራ', 'የነቢዩ ታሪክ', 'ታሪክ',
-    'seenaa', 'seenaa nabiyyii', 'nabiyyii',
-  ],
-  'crs-9': [
-    'nahu', 'sarf', 'grammar', 'arabic', 'ajrumiyyah',
-    'ነህው', 'ሰርፍ', 'ሰዋሰው', 'አረብኛ', 'አጅሩሚያ',
-    'nahwii', 'sarfii', 'seera afaanii', 'afaan arabaa',
-  ],
-  'crs-10': [
-    'tajweed', 'quran recitation', 'tuhfat al-atfal',
-    'ተጅዊድ', 'አነባበብ', 'ቱሕፈቱል አጥፋል',
-    'tajwiida', 'dubbisa qur\'aanaa',
-  ],
-  'crs-11': [
-    'adab', 'manner', 'ethics', 'hilyat talib al-ilm',
-    'አደብ', 'ስነ-ምግባር', 'ሂልየቱ ጣሊቢል ኢልም',
-    'aadaa', 'naamusa', 'amala gaarii',
+    'tanbihat', 'women rulings', 'believing women', 'fiqh', 'fawzan', 'hijab', 'family',
+    'ተንቢሓት', 'ተንቢሃት', 'የሴቶች ህግጋት', 'ፊቅህ', 'ሂጃብ', 'ፈውዛን', 'የሴቶች ኪታብ',
+    'tanbihaata', 'seera dubartootaa', 'fiqhii', 'tanbiihaat', 'hijaaba',
   ],
 };
 

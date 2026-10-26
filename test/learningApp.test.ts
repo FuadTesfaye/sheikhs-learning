@@ -7,16 +7,11 @@ import { scale, moderateScale, FontSize } from '../src/theme/spacing';
 
 describe("Sheikh's Islamic Learning App Core Tests", () => {
   it('loads all core categories correctly', () => {
-    expect(categories.length).toBeGreaterThanOrEqual(8);
+    expect(categories.length).toBe(3);
     const names = categories.map(c => c.name);
     expect(names).toContain('العقيدة');
-    expect(names).toContain('التفسير');
     expect(names).toContain('الحديث');
     expect(names).toContain('الفقه');
-    expect(names).toContain('السيرة');
-    expect(names).toContain('اللغة العربية');
-    expect(names).toContain('التجويد');
-    expect(names).toContain('الآداب والأخلاق');
   });
 
   it('filters courses by category and lessons by course', () => {
@@ -132,18 +127,21 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
   });
 
   it('validates Arabic-only kitab titles across all courses without English transliterations', () => {
-    expect(courses.length).toBeGreaterThanOrEqual(10);
+    expect(courses.length).toBe(7);
     courses.forEach(course => {
       // Must not contain English words like 'Kitab' or 'Foundations' in the title
       expect(course.title).not.toMatch(/[a-zA-Z]/);
       expect(course.title.length).toBeGreaterThan(0);
     });
 
-    // Check primary titles
+    // Check all 7 authentic Kitab titles
     expect(courses[0].title).toBe('كِتَابُ التَّوْحِيدِ');
     expect(courses[1].title).toBe('ثَلَاثَةُ الأُصُولِ وَأَدِلَّتُهَا');
     expect(courses[2].title).toBe('القَوَاعِدُ الأَرْبَعُ');
-    expect(courses[3].title).toBe('كَشْفُ الشُّبُهَاتِ');
+    expect(courses[3].title).toBe('الأَرْبَعُونَ النَّوَوِيَّةُ');
+    expect(courses[4].title).toBe('شُرُوطُ الصَّلَاةِ وَأَرْكَانُهَا وَوَاجِبَاتُهَا');
+    expect(courses[5].title).toBe('سَفِينَةُ النَّجَاةِ وَسَفِينَةُ الصَّلَاةِ');
+    expect(courses[6].title).toBe('تَنْبِيهَاتٌ عَلَى أَحْكَامٍ تَخْتَصُّ بِالمُؤْمِنَاتِ');
   });
 
   it('validates exactly 3 welcome pages covering The Sheikhs, The Courses, and Bunyan', async () => {
@@ -168,7 +166,7 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     expect(coursesSlide.badge).toContain('Courses');
     expect(coursesSlide.arabicBadge).toBe('مَنَاهِجُ الدِّرَاسَةِ');
     expect(coursesSlide.curriculumCategories).toBeDefined();
-    expect(coursesSlide.curriculumCategories?.length).toBeGreaterThanOrEqual(6);
+    expect(coursesSlide.curriculumCategories?.length).toBe(3);
     expect(coursesSlide.highlights.some(h => h.title.includes('Offline'))).toBe(true);
 
     // Page 3: Bunyan

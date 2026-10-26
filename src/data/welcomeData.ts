@@ -125,11 +125,8 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
           ],
           curriculumCategories: [
             { name: 'العقيدة', arabic: 'عقيدة', color: '#1B5E20' },
-            { name: 'التفسير', arabic: 'تفسير', color: '#0D47A1' },
             { name: 'الحديث', arabic: 'حديث', color: '#BF360C' },
             { name: 'الفقه', arabic: 'فقه', color: '#4A148C' },
-            { name: 'السيرة', arabic: 'سيرة', color: '#006064' },
-            { name: 'اللغة العربية', arabic: 'نحو وصرف', color: '#E65100' },
           ],
         },
         {
@@ -251,11 +248,8 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
           ],
           curriculumCategories: [
             { name: 'ዐቂዳ', arabic: 'عقيدة', color: '#1B5E20' },
-            { name: 'ተፍሲር', arabic: 'تفسير', color: '#0D47A1' },
             { name: 'ሐዲስ', arabic: 'حديث', color: '#BF360C' },
             { name: 'ፊቅህ', arabic: 'فقه', color: '#4A148C' },
-            { name: 'ሲራህ', arabic: 'سيرة', color: '#006064' },
-            { name: 'ቋንቋ', arabic: 'نحو وصرف', color: '#E65100' },
           ],
         },
         {
@@ -378,11 +372,8 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
           ],
           curriculumCategories: [
             { name: 'Aqiidaa', arabic: 'عقيدة', color: '#1B5E20' },
-            { name: 'Tafsiira', arabic: 'تفسير', color: '#0D47A1' },
             { name: 'Hadiisa', arabic: 'حديث', color: '#BF360C' },
             { name: 'Fiqhii', arabic: 'فقه', color: '#4A148C' },
-            { name: 'Siiraa', arabic: 'سيرة', color: '#006064' },
-            { name: 'Afaan Arabaa', arabic: 'نحو وصرف', color: '#E65100' },
           ],
         },
         {
@@ -506,11 +497,8 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
           ],
           curriculumCategories: [
             { name: 'Aqeedah', arabic: 'عقيدة', color: '#1B5E20' },
-            { name: 'Tafsir', arabic: 'تفسير', color: '#0D47A1' },
             { name: 'Hadith', arabic: 'حديث', color: '#BF360C' },
             { name: 'Fiqh', arabic: 'فقه', color: '#4A148C' },
-            { name: 'Seerah', arabic: 'سيرة', color: '#006064' },
-            { name: 'Arabic', arabic: 'نحو وصرف', color: '#E65100' },
           ],
         },
         {

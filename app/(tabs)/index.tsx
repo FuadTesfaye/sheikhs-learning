@@ -39,7 +39,7 @@ export default function HomeScreen() {
     router.push(`/lesson/${lessonId}`);
   }, []);
 
-  const featuredCourses = courses.slice(0, 4);
+  const featuredCourses = courses;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
