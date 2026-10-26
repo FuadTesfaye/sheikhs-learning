@@ -19,7 +19,7 @@ export interface WelcomePillar {
 }
 
 export interface WelcomeSlide {
-  id: 'sheikhs' | 'courses' | 'bunyan';
+  id: 'bunyan' | 'courses' | 'sheikhs';
   badge: string;
   arabicBadge: string;
   icon: string;
@@ -48,19 +48,98 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
     case 'ar':
       return [
         {
+          id: 'bunyan',
+          badge: 'مُبَادَرَةُ بُنْيَان',
+          arabicBadge: 'مَنْ بَنَاهَا',
+          icon: 'layers-outline',
+          title: 'بُنْيَان: حِصْنٌ رَقْمِيٌّ لِنَشْرِ العِلْمِ النَّافِعِ',
+          arabicQuote: '« الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا »',
+          quoteTranslation: 'حديث شريف في صحيحي البخاري ومسلم.',
+          description:
+            'مبادرة بنيان مشروع وقفي تقني غير ربحي، صُمم بأيدي أبناء الأمة لجمع التراث العلمي الأصيل وتيسيره للجميع بأحدث التقنيات مجاناً 100% ودون أي إعلانات لوجه الله تعالى كصدقة جارية.',
+          highlightColor: '#BF360C',
+          accentColor: '#FF8F00',
+          buttonLabel: 'الانتقال إلى محتوى التطبيق',
+          nextStepTitle: 'التالي: ما هو التطبيق',
+          highlights: [
+            {
+              icon: 'gift-outline',
+              title: '100% وقف خيري · صدقة جارية',
+              description: 'تطبيق مجاني خالص لوجه الله تعالى دون أي إعلانات أو رسوم إطلاقاً.',
+            },
+            {
+              icon: 'shield-checkmark-outline',
+              title: 'حصن رقمي للأمة',
+              description: 'حفظ التراث الإسلامي الصافي وتسهيل وصول طلبة العلم والأسر المسلمة إليه.',
+            },
+            {
+              icon: 'phone-portrait-outline',
+              title: 'تجربة تقنية متقدمة',
+              description: 'خطوط عربية واضحة، تحكم بحجم النص، وضع ليلي، ودعم كامل للعمل دون اتصال.',
+            },
+          ],
+          pillars: [
+            { title: 'وقف دائم', subtitle: 'مجاني 100% وخالٍ من أي استغلال مادي', icon: 'sparkles-outline' },
+            { title: 'نقل أمين', subtitle: 'حفاظ على أصالة المادة العلمية', icon: 'shield-checkmark-outline' },
+            { title: 'حصن رقمي', subtitle: 'يعمل دون إنترنت وموثوق في كل مكان', icon: 'server-outline' },
+          ],
+        },
+        {
+          id: 'courses',
+          badge: 'مَحْتَوَى التَّطْبِيقِ وَالمَنَاهِجُ',
+          arabicBadge: 'مَنَاهِجُ الدِّرَاسَةِ',
+          icon: 'book-outline',
+          title: 'مَا هُوَ التَّطْبِيق: مَكْتَبَةٌ عِلْمِيَّةٌ وَمَنَاهِجُ مُتَكَامِلَةٌ',
+          arabicQuote: '« مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ »',
+          quoteTranslation: 'حديث شريف رواه الإمام مسلم في صحيحه.',
+          description:
+            'أكاديمية رقمية متكاملة تضم 7 متون علمية أصيلة في العقيدة والحديث والفقه، مع مشغل صوتي دقيق، عارض كتب PDF مدمج، وتحميل كامل للاستماع دون اتصال بأربع لغات.',
+          highlightColor: '#0D47A1',
+          accentColor: '#00ACC1',
+          buttonLabel: 'الانتقال إلى فضيلة الشيخ',
+          nextStepTitle: 'التالي: شيوخنا الأفاضل',
+          highlights: [
+            {
+              icon: 'layers-outline',
+              title: '7 متون علمية أصيلة',
+              description: 'مناهج متدرجة تبدأ بالعقيدة (كتاب التوحيد، الأصول الثلاثة، القواعد الأربع) والحديث والفقه.',
+            },
+            {
+              icon: 'document-text-outline',
+              title: 'عرض متزامن لـ PDF',
+              description: 'تصفح صفحات الكتاب الأصلي أثناء الاستماع لشرح الشيخ مباشرة دون أي تأخير.',
+            },
+            {
+              icon: 'cloud-download-outline',
+              title: 'دراسة دون اتصال 100%',
+              description: 'تحميل ذكي يدعم الاستئناف التلقائي للاستماع والمطالعة في أي وقت دون إنترنت.',
+            },
+            {
+              icon: 'language-outline',
+              title: '4 لغات حية',
+              description: 'واجهة وترجمة كاملة باللغة العربية، الإنجليزية، الأمهرية፣ والأورومية.',
+            },
+          ],
+          curriculumCategories: [
+            { name: 'العقيدة', arabic: 'عقيدة', color: '#1B5E20' },
+            { name: 'الحديث', arabic: 'حديث', color: '#BF360C' },
+            { name: 'الفقه', arabic: 'فقه', color: '#4A148C' },
+          ],
+        },
+        {
           id: 'sheikhs',
           badge: 'الوفاء للشيوخ والدعاء لهم',
           arabicBadge: 'ادْعُوا لِلشَّيْخِ',
           icon: 'heart-circle-outline',
-          title: 'الشيوخ: حَمَلَةُ العلم الشريف وأهله',
+          title: 'مَنْ هُوَ الشَّيْخ: حَمَلَةُ العِلْمِ الشَّرِيفِ وَأَهْلُهُ',
           arabicQuote: '« جَزَاهُ ٱللَّٰهُ خَيْرًا وَغَفَرَ لَهُ وَنَفَعَ بِعِلْمِهِ »',
           quoteTranslation: 'نسأل الله أن يجزي شيوخنا خير الجزاء، وأن يغفر لهم، وينفع الأمة بعلمهم المبارك.',
           description:
-            'العلم الشرعي أمانة متوارثة نُقلت عبر أجيال من العلماء الربانيين والمعلمين المخلصين. كل درس وسلسلة علمية هنا هي ثمرة جهودهم المباركة في خدمة كتاب الله وسنة رسوله ﷺ.',
+            'العلم الشرعي أمانة متوارثة نُقلت عبر أجيال من العلماء الربانيين والمعلمين المخلصين. كل درس وسلسلة علمية هنا هي ثمرة جهودهم المباركة في خدمة كتاب الله وسنة رسوله ﷺ، وواجبنا حفظ فضلهم بالدعاء المستمر لهم.',
           highlightColor: '#1B5E20',
           accentColor: '#D4AF37',
-          buttonLabel: 'الانتقال إلى المناهج والدروس',
-          nextStepTitle: 'التالي: المناهج الدراسية',
+          buttonLabel: 'ابدأ طلب العلم',
+          nextStepTitle: 'ابدأ طلب العلم',
           highlights: [
             {
               icon: 'ribbon-outline',
@@ -87,103 +166,103 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
             buttonActiveText: 'آمين · جَزَاكَ ٱللَّٰهُ خَيْرًا',
           },
         },
-        {
-          id: 'courses',
-          badge: 'المناهج والمسارات العلمية',
-          arabicBadge: 'مَنَاهِجُ الدِّرَاسَةِ',
-          icon: 'book-outline',
-          title: 'مسارات تعليمية متكاملة ومنهجية',
-          arabicQuote: '« مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ »',
-          quoteTranslation: 'حديث شريف رواه الإمام مسلم في صحيحه.',
-          description:
-            'مناهج دراسية متدرجة تغطي علوم العقيدة والتفسير والحديث والفقه والسيرة واللغة، مقسمة بعناية لتناسب كل طالب علم.',
-          highlightColor: '#0D47A1',
-          accentColor: '#00ACC1',
-          buttonLabel: 'الانتقال إلى مبادرة بنيان',
-          nextStepTitle: 'التالي: عن بنيان',
-          highlights: [
-            {
-              icon: 'layers-outline',
-              title: 'تدرج منهجي',
-              description: 'مستويات واضحة تبدأ من صغار العلم وتتدرج إلى أمهات المتون.',
-            },
-            {
-              icon: 'headset-outline',
-              title: 'صوت عالي النقاء',
-              description: 'استمع للدروس أثناء تنقلاتك وأوقات فراغك بكل يسر وسهولة.',
-            },
-            {
-              icon: 'cloud-download-outline',
-              title: 'دراسة دون اتصال 100%',
-              description: 'حمل المتون الكاملة واستمع لها في أي وقت دون الحاجة للإنترنت.',
-            },
-            {
-              icon: 'checkmark-circle-outline',
-              title: 'متابعة ذكية للتقدم',
-              description: 'يحفظ التطبيق مكان وقوفك تلقائياً لتستأنف التعلم بسلاسة.',
-            },
-          ],
-          curriculumCategories: [
-            { name: 'العقيدة', arabic: 'عقيدة', color: '#1B5E20' },
-            { name: 'الحديث', arabic: 'حديث', color: '#BF360C' },
-            { name: 'الفقه', arabic: 'فقه', color: '#4A148C' },
-          ],
-        },
-        {
-          id: 'bunyan',
-          badge: 'منصة ومبادرة بنيان',
-          arabicBadge: 'مُبَادَرَةُ بُنْيَان',
-          icon: 'layers-outline',
-          title: 'بُنْيَان: حِصْنٌ رَقْمِيٌّ لِنَشْرِ العِلْمِ النَّافِعِ',
-          arabicQuote: '« الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا »',
-          quoteTranslation: 'حديث شريف في صحيحي البخاري ومسلم.',
-          description:
-            'مبادرة بنيان مشروع وقفي غير ربحي صُمم لجمع التراث العلمي الإسلامي وتيسيره بأحدث الوسائل التقنية، خالٍ تماماً من الإعلانات والاشتراكات.',
-          highlightColor: '#BF360C',
-          accentColor: '#FF8F00',
-          buttonLabel: 'ابدأ طلب العلم',
-          nextStepTitle: 'ابدأ طلب العلم',
-          highlights: [
-            {
-              icon: 'gift-outline',
-              title: '100% وقف خيري · صدقة جارية',
-              description: 'تطبيق مجاني خالص لوجه الله تعالى دون أي إعلانات أو رسوم إطلاقاً.',
-            },
-            {
-              icon: 'people-outline',
-              title: 'قوة للأمة الإسلامية',
-              description: 'بُني لتمكين المسلمين والطلاب والأسر من تحصيل العلم الصافي بيسر.',
-            },
-            {
-              icon: 'phone-portrait-outline',
-              title: 'سهولة وسلاسة كاملة',
-              description: 'خطوط عربية واضحة، تحكم بحجم النص، ووضع ليلي مريح للقراءة.',
-            },
-          ],
-          pillars: [
-            { title: 'وقف دائم', subtitle: 'مجاني 100% وخالٍ من أي استغلال مادي', icon: 'sparkles-outline' },
-            { title: 'نقل أمين', subtitle: 'حفاظ على أصالة المادة العلمية', icon: 'shield-checkmark-outline' },
-            { title: 'حصن رقمي', subtitle: 'يعمل دون إنترنت وموثوق في كل مكان', icon: 'server-outline' },
-          ],
-        },
       ];
 
     case 'am':
       return [
         {
+          id: 'bunyan',
+          badge: 'የቡንያን ተነሳሽነት',
+          arabicBadge: 'مَنْ بَنَاهَا',
+          icon: 'layers-outline',
+          title: 'ቡንያን: ትክክለኛ የእስልምና እውቀት ዲጂታል ምሽግ',
+          arabicQuote: '« الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا »',
+          quoteTranslation: '«አማኝ ለአማኝ ልክ እንደ ህንጻ ነው፤ አንዱ ሌላውን ያጠናክራል።» (ቡኻሪ እና ሙስሊም)',
+          description:
+            'ቡንያን ትክክለኛ የእስልምና እውቀትን ከዘመናዊ ቴክኖሎጂ ጋር በማጣመር የተቋቋመ ነጻ የዲጂታል ተነሳሽነት ነው። እንደ ቋሚ ወቅፍና ሰደቀቱል ጃሪያህ የተዘጋጀ ሆኖ ምንም አይነት ማስታወቂያ ወይም ክፍያ የለውም።',
+          highlightColor: '#BF360C',
+          accentColor: '#FF8F00',
+          buttonLabel: 'ወደ መተግበሪያው ቀጥል',
+          nextStepTitle: 'ቀጣይ: ስለ መተግበሪያው',
+          highlights: [
+            {
+              icon: 'gift-outline',
+              title: '100% ነጻ · ሰደቀቱል ጃሪያህ',
+              description: 'ምንም አይነት ማስታወቂያ ወይም ክፍያ የሌለው ቋሚ ወቅፍ።',
+            },
+            {
+              icon: 'shield-checkmark-outline',
+              title: 'ለኡማው የተገነባ ምሽግ',
+              description: 'ትክክለኛውን እውቀት በመጠበቅ ለተማሪዎችና ለቤተሰብ ተደራሽ ማድረግ።',
+            },
+            {
+              icon: 'phone-portrait-outline',
+              title: 'ቀላልና ዘመናዊ አጠቃቀም',
+              description: 'ግልጽ ጽሑፎች፣ የፊደል መጠን ማስተካከያ፣ የምሽት ንባብና ያለ ኢንተርኔት መስራት።',
+            },
+          ],
+          pillars: [
+            { title: 'ቋሚ ወቅፍ', subtitle: 'ምንም የገንዘብ ክፍያ የሌለው፣ 100% ነጻ', icon: 'sparkles-outline' },
+            { title: 'ታማኝ ስርጭት', subtitle: 'ትክክለኛውን እውቀት መጠበቅ', icon: 'shield-checkmark-outline' },
+            { title: 'ዲጂታል ምሽግ', subtitle: 'ያለ ኢንተርኔት የሚሰራ አስተማማኝ', icon: 'server-outline' },
+          ],
+        },
+        {
+          id: 'courses',
+          badge: 'የመተግበሪያው ይዘትና ኪታቦች',
+          arabicBadge: 'مَنَاهِجُ الدِّرَاسَةِ',
+          icon: 'book-outline',
+          title: 'መተግበሪያው ምንድን ነው: ትክክለኛ የኪታቦች ቤተ-መጽሐፍት',
+          arabicQuote: '« مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ »',
+          quoteTranslation: '«እውቀትን ፍለጋ መንገድ የጀመረን ሰው አላህ ወደ ጀነት የሚወስደውን መንገድ ያቀልለታል።» (ሶሒሕ ሙስሊም)',
+          description:
+            'በዐቂዳ፣ በሐዲስና በፊቅህ የተዋቀሩ 7 ዋና ዋና ትክክለኛ ኪታቦች፣ ጥራት ያለው የድምጽ ማጫወቻ፣ የተሟላ ፒዲኤፍ (PDF) ንባብ እና ያለ ኢንተርኔት የማውረድ አሰራር የተካተቱበት መተግበሪያ ነው።',
+          highlightColor: '#0D47A1',
+          accentColor: '#00ACC1',
+          buttonLabel: 'ወደ ሼኾቻችን ቀጥል',
+          nextStepTitle: 'ቀጣይ: ስለ ሼኾቻችን',
+          highlights: [
+            {
+              icon: 'layers-outline',
+              title: '7 ትክክለኛ ኪታቦች',
+              description: 'በዐቂዳ (ኪ/ተውሂድ፣ ሰላሰቱል ኡሱል፣ ቀዋዒዱል አርበዓ)፣ ሐዲስና ፊቅህ የተዘጋጁ።',
+            },
+            {
+              icon: 'document-text-outline',
+              title: 'የኪታብ ፒዲኤፍ (PDF) እይታ',
+              description: 'ድምጹን እያደመጡ የኪታቡን ገጽ በቅጽበት አብሮ መከታተል።',
+            },
+            {
+              icon: 'cloud-download-outline',
+              title: '100% ያለ ኢንተርኔት',
+              description: 'ትምህርቶችን አውርደው ያለ ኢንተርኔት በማንኛውም ሰዓት መማር።',
+            },
+            {
+              icon: 'language-outline',
+              title: '4 ቋንቋዎች',
+              description: 'በዐረብኛ፣ በእንግሊዝኛ፣ በአማርኛ እና በኦሮምኛ የተሟላ አገልግሎት።',
+            },
+          ],
+          curriculumCategories: [
+            { name: 'ዐቂዳ', arabic: 'عقيدة', color: '#1B5E20' },
+            { name: 'ሐዲስ', arabic: 'حديث', color: '#BF360C' },
+            { name: 'ፊቅህ', arabic: 'فقه', color: '#4A148C' },
+          ],
+        },
+        {
           id: 'sheikhs',
           badge: 'ለሼኾች ክብር መስጠትና ዱዓእ ማድረግ',
           arabicBadge: 'ادْعُوا لِلشَّيْخِ',
           icon: 'heart-circle-outline',
-          title: 'የእውቀት ባለአደራዎች የሆኑት ሼኾቻችን',
+          title: 'ሼኾቹ እነማን ናቸው: የተቀደሰውን አደራ የተሸከሙ',
           arabicQuote: '« جَزَاهُ ٱللَّٰهُ خَيْرًا وَغَفَرَ لَهُ وَنَفَعَ بِعِلْمِهِ »',
           quoteTranslation: 'አላህ ለመምህሮቻችን ታላቅ ምንዳን ይስጣቸው፣ ይማራቸው፣ በእውቀታቸውም ኡማውን ይጠቅምበት።',
           description:
             'በእስልምና እውነተኛ እውቀት በታማኝ ዑለማዎችና መምህራን በኩል የሚተላለፍ አደራ ነው። እዚህ የቀረቡት ትምህርቶች ሼኾቻችን ለቁርኣንና ሐዲስ የሰጡትን ታላቅ አገልግሎት ያከብራሉ።',
           highlightColor: '#1B5E20',
           accentColor: '#D4AF37',
-          buttonLabel: 'ወደ ኮርሶቹ ቀጥል',
-          nextStepTitle: 'ቀጣይ: ኮርሶች',
+          buttonLabel: 'እውቀት መፈለግ ጀምር',
+          nextStepTitle: 'እውቀት መፈለግ ጀምር',
           highlights: [
             {
               icon: 'ribbon-outline',
@@ -210,95 +289,95 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
             buttonActiveText: 'አሚን · ጀዛከላሁ ኸይረን',
           },
         },
-        {
-          id: 'courses',
-          badge: 'የጥናት መርሃ-ግብሮችና ኮርሶች',
-          arabicBadge: 'مَنَاهِجُ الدِّرَاسَةِ',
-          icon: 'book-outline',
-          title: 'የተሟሉ ኮርሶችና የጥናት መንገዶች',
-          arabicQuote: '« مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ »',
-          quoteTranslation: '«እውቀትን ፍለጋ መንገድ የጀመረን ሰው አላህ ወደ ጀነት የሚወስደውን መንገድ ያቀልለታል።» (ሶሒሕ ሙስሊም)',
-          description:
-            'በእስልምና መሰረታዊና ከፍተኛ የእውቀት ዘርፎች የተዋቀረ ስርአተ-ትምህርት። እያንዳንዱ ኮርስ በድምጽ፣ በንባብና በትምህርት ክትትል የተደገፈ ነው።',
-          highlightColor: '#0D47A1',
-          accentColor: '#00ACC1',
-          buttonLabel: 'ወደ ቡንያን ቀጥል',
-          nextStepTitle: 'ቀጣይ: ስለ ቡንያን',
-          highlights: [
-            {
-              icon: 'layers-outline',
-              title: 'ደረጃ በደረጃ የሚሰጥ ትምህርት',
-              description: 'ከመሰረታዊ እስከ ከፍተኛ ደረጃዎች በቅደም ተከተል የተዘጋጀ።',
-            },
-            {
-              icon: 'headset-outline',
-              title: 'ድምጽ በማንኛውም ቦታ',
-              description: 'በጉዞ ላይ ወይም በትርፍ ጊዜ በቀላሉ ለማዳመጥ የተመቻቸ።',
-            },
-            {
-              icon: 'cloud-download-outline',
-              title: '100% ያለ ኢንተርኔት',
-              description: 'ትምህርቶችን አውርደው ያለ ኢንተርኔት በፈለጉት ጊዜ ይማሩ።',
-            },
-            {
-              icon: 'checkmark-circle-outline',
-              title: 'ስማርት የትምህርት ክትትል',
-              description: 'ያቆሙበትን ደቂቃ በራሱ በማስታወስ በቀላሉ ይቀጥላል።',
-            },
-          ],
-          curriculumCategories: [
-            { name: 'ዐቂዳ', arabic: 'عقيدة', color: '#1B5E20' },
-            { name: 'ሐዲስ', arabic: 'حديث', color: '#BF360C' },
-            { name: 'ፊቅህ', arabic: 'فقه', color: '#4A148C' },
-          ],
-        },
-        {
-          id: 'bunyan',
-          badge: 'የቡንያን መድረክ',
-          arabicBadge: 'مُبَادَرَةُ بُنْيَان',
-          icon: 'layers-outline',
-          title: 'ቡንያን: ትክክለኛ የእስልምና እውቀት ዲጂታል ምሽግ',
-          arabicQuote: '« الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا »',
-          quoteTranslation: '«አማኝ ለአማኝ ልክ እንደ ህንጻ ነው፤ አንዱ ሌላውን ያጠናክራል።» (ቡኻሪ እና ሙስሊም)',
-          description:
-            'ቡንያን ትክክለኛ የእስልምና እውቀትን ከዘመናዊ ቴክኖሎጂ ጋር በማጣመር የተቋቋመ ነጻ የዲጂታል ተነሳሽነት ነው። እንደ ቋሚ ወቅፍና ሰደቀቱል ጃሪያህ የተዘጋጀ ነው።',
-          highlightColor: '#BF360C',
-          accentColor: '#FF8F00',
-          buttonLabel: 'እውቀት መፈለግ ጀምር',
-          nextStepTitle: 'እውቀት መፈለግ ጀምር',
-          highlights: [
-            {
-              icon: 'gift-outline',
-              title: '100% ነጻ · ሰደቀቱል ጃሪያህ',
-              description: 'ምንም አይነት ማስታወቂያ ወይም ክፍያ የሌለው ቋሚ ወቅፍ።',
-            },
-            {
-              icon: 'people-outline',
-              title: 'ኡማውን ማጠናከር',
-              description: 'ግለሰቦችንና ቤተሰቦችን አስተማማኝ እውቀት እንዲያገኙ ማስቻል።',
-            },
-            {
-              icon: 'phone-portrait-outline',
-              title: 'ቀላልና ምቹ',
-              description: 'ግልጽ ጽሑፎች፣ የፊደል መጠን ማስተካከያና የምሽት ንባብ ገጽታ።',
-            },
-          ],
-          pillars: [
-            { title: 'ቋሚ ወቅፍ', subtitle: 'ምንም የገንዘብ ክፍያ የሌለው፣ 100% ነጻ', icon: 'sparkles-outline' },
-            { title: 'ታማኝ ስርጭት', subtitle: 'ትክክለኛውን እውቀት መጠበቅ', icon: 'shield-checkmark-outline' },
-            { title: 'ዲጂታል ምሽግ', subtitle: 'ያለ ኢንተርኔት የሚሰራ አስተማማኝ', icon: 'server-outline' },
-          ],
-        },
       ];
 
     case 'om':
       return [
         {
+          id: 'bunyan',
+          badge: 'Inisheetivii Bunyaan',
+          arabicBadge: 'مَنْ بَنَاهَا',
+          icon: 'layers-outline',
+          title: 'Bunyaan: Masaraa Dijitaalaa Beekumsa Islaamaa Qulqulluu',
+          arabicQuote: '« الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا »',
+          quoteTranslation: '«Mu\'minni mu\'minaaf akka ijaarsa gamooti; gariin isaanii garii jabeessa.» (Bukhaarii fi Muslim)',
+          description:
+            'Bunyaan beekumsa Islaamaa qulqulluu teeknoolojii ammayyaa wajjin walitti fiduuf kan hundeeffame inisheetivii dhuunfaa bilisaati. Akka waqfii fi sadaqaa itti-fufaatti qophaa\'ee beeksisa fi kaffaltii tokkollee hin qabu.',
+          highlightColor: '#BF360C',
+          accentColor: '#FF8F00',
+          buttonLabel: 'Gara Appiitti Itti Fufaa',
+          nextStepTitle: "Itti Aanu: Waa'ee Appii",
+          highlights: [
+            {
+              icon: 'gift-outline',
+              title: '100% Bilisa · Sadaqah Jariyah',
+              description: 'Waqfii ummataaf ta\'e, beeksisa fi kaffaltii tokkollee hin qabu.',
+            },
+            {
+              icon: 'shield-checkmark-outline',
+              title: 'Masaraa Ummatichaa',
+              description: 'Beekumsa dhugaa eeguun barattootaa fi maatiif akka qaqqabu gochuu.',
+            },
+            {
+              icon: 'phone-portrait-outline',
+              title: 'Fayyadamuuf Salphaa',
+              description: 'Barreeffama ifa, guddina qubee jijjiiruu, halkan dubbisuu fi intarneetii malee hojjechuu.',
+            },
+          ],
+          pillars: [
+            { title: 'Waqfii Dhaabbataa', subtitle: 'Kaffaltii hin qabu, 100% bilisa', icon: 'sparkles-outline' },
+            { title: 'Dabarsa Amanamaa', subtitle: 'Beekumsa dhugaa eeguu', icon: 'shield-checkmark-outline' },
+            { title: 'Masaraa Dijitaalaa', subtitle: 'Intarneetii malee amansiisaa', icon: 'server-outline' },
+          ],
+        },
+        {
+          id: 'courses',
+          badge: 'Qabiyyee Appii fi Kitaabbilee',
+          arabicBadge: 'مَنَاهِجُ الدِّرَاسَةِ',
+          icon: 'book-outline',
+          title: 'Appiin Kun Maali: Kitaabbilee Amanamaa fi Qorannoo',
+          arabicQuote: '« مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ »',
+          quoteTranslation: '«Nama beekumsa barbaachaaf karaa deeme, Allaahn gara jannataatti karaa isaaf laaffisa.» (Sahiih Muslim)',
+          description:
+            'Akaadaamii dijitaalaa kitaabbilee qulqulluu 7 Aqiidaa, Hadiisa fi Fiqhii of keessaa qabu. Sagalee qulqulluu, PDF kitaabaa dubbisuu fi intarneetii malee buufatanii barachuu dabalata.',
+          highlightColor: '#0D47A1',
+          accentColor: '#00ACC1',
+          buttonLabel: 'Gara Sheekotaatti Itti Fufaa',
+          nextStepTitle: "Itti Aanu: Waa'ee Sheekotaa",
+          highlights: [
+            {
+              icon: 'layers-outline',
+              title: 'Kitaabbilee Qulqulluu 7',
+              description: 'Aqiidaa (K/Towhiid, Salaasatul Usuul, Qawaa\'idul Arba\'aa), Hadiisa fi Fiqhii.',
+            },
+            {
+              icon: 'document-text-outline',
+              title: 'PDF Kitaabaa Dubbisuu',
+              description: 'Sagalee dhaggeeffachaa fuula kitaabaa yeruma sanatti faana bu\'uu.',
+            },
+            {
+              icon: 'cloud-download-outline',
+              title: '100% Sarara Malee',
+              description: 'Koorsoota buufachuun intarneetii malee yeroo barbaaddan baradhaa.',
+            },
+            {
+              icon: 'language-outline',
+              title: 'Afaanota 4',
+              description: 'Afaan Arabaa, Ingiliffaa, Amaariffaa fi Afaan Oromoitiin qophaa\'e.',
+            },
+          ],
+          curriculumCategories: [
+            { name: 'Aqiidaa', arabic: 'عقيدة', color: '#1B5E20' },
+            { name: 'Hadiisa', arabic: 'حديث', color: '#BF360C' },
+            { name: 'Fiqhii', arabic: 'فقه', color: '#4A148C' },
+          ],
+        },
+        {
           id: 'sheikhs',
           badge: 'Sheekota Kabajuu fi Du’aa’ii Gochuu',
           arabicBadge: 'ادْعُوا لِلشَّيْخِ',
           icon: 'heart-circle-outline',
-          title: 'Sheekonni: Abbootii Amana Beekumsa Qulqulluu',
+          title: 'Sheekonni Eenyu: Abbootii Amana Beekumsa Qulqulluu',
           arabicQuote: '« جَزَاهُ ٱللَّٰهُ خَيْرًا وَغَفَرَ لَهُ وَنَفَعَ بِعِلْمِهِ »',
           quoteTranslation:
             'Allaahn barsiisota keenyaaf galata guddaa haa kennuuf, isaaniif haa araaramu, beekumsa isaaniitiinis Ummaticha haa fayyadu.',
@@ -306,8 +385,8 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
             'Beekumsa Islaamaa keessatti beekumsa qulqulluu jechuun amana ulamaa\'ota fi barsiisota amanamaadhaan dhalootaaf darbedha. Barnoonni asitti dhihaate hundi tajaajila sheekonni keenya Qur\'aana fi Hadiisaaf kennan kan kabajudha.',
           highlightColor: '#1B5E20',
           accentColor: '#D4AF37',
-          buttonLabel: 'Gara Koorsootaatti Itti Fufaa',
-          nextStepTitle: 'Itti Aanu: Koorsoota',
+          buttonLabel: 'Beekumsa Barbaaduu Jalqabi',
+          nextStepTitle: 'Beekumsa Barbaaduu Jalqabi',
           highlights: [
             {
               icon: 'ribbon-outline',
@@ -334,96 +413,96 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
             buttonActiveText: 'Aamiin · جَزَاكَ ٱللَّٰهُ خَيْرًا',
           },
         },
-        {
-          id: 'courses',
-          badge: 'Sirna Barnootaa fi Koorsoota',
-          arabicBadge: 'مَنَاهِجُ الدِّرَاسَةِ',
-          icon: 'book-outline',
-          title: 'Koorsoota Guutuu fi Karaalee Barnootaa',
-          arabicQuote: '« مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ »',
-          quoteTranslation: '«Nama beekumsa barbaachaaf karaa deeme, Allaahn gara jannataatti karaa isaaf laaffisa.» (Sahiih Muslim)',
-          description:
-            'Sirna barnootaa beekumsa bu\'uuraa fi olaanaa Islaamaa of keessatti qabate. Koorsoonni hundi sagalee fi hordoffii adeemsaatiin qindaa\'aniiru.',
-          highlightColor: '#0D47A1',
-          accentColor: '#00ACC1',
-          buttonLabel: 'Gara Bunyaanitti Itti Fufaa',
-          nextStepTitle: 'Itti Aanu: Waa\'ee Bunyaan',
-          highlights: [
-            {
-              icon: 'layers-outline',
-              title: 'Sadarkaa Sadarkaadhaan',
-              description: 'Jalqabaa kaasee hanga sadarkaa olaanaatti kan qophaa\'e.',
-            },
-            {
-              icon: 'headset-outline',
-              title: 'Sagalee Bakka Hundatti',
-              description: 'Imala keessatti ykn yeroo boqonnaatti salphaatti dhaggeeffachuuf.',
-            },
-            {
-              icon: 'cloud-download-outline',
-              title: '100% Sarara Malee',
-              description: 'Koorsoota buufachuun intarneetii malee yeroo barbaaddan baradhaa.',
-            },
-            {
-              icon: 'checkmark-circle-outline',
-              title: 'Hordoffii Adeemsaa Saffisaa',
-              description: 'Bakka dhaabbatanirraa ofumaan itti fufa.',
-            },
-          ],
-          curriculumCategories: [
-            { name: 'Aqiidaa', arabic: 'عقيدة', color: '#1B5E20' },
-            { name: 'Hadiisa', arabic: 'حديث', color: '#BF360C' },
-            { name: 'Fiqhii', arabic: 'فقه', color: '#4A148C' },
-          ],
-        },
-        {
-          id: 'bunyan',
-          badge: 'Pilaatfoormii Bunyaan',
-          arabicBadge: 'مُبَادَرَةُ بُنْيَان',
-          icon: 'layers-outline',
-          title: 'Bunyaan: Masaraa Dijitaalaa Beekumsa Islaamaa Qulqulluu',
-          arabicQuote: '« الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا »',
-          quoteTranslation: '«Mu\'minni mu\'minaaf akka ijaarsa gamooti; gariin isaanii garii jabeessa.» (Bukhaarii fi Muslim)',
-          description:
-            'Bunyaan beekumsa Islaamaa qulqulluu teeknoolojii ammayyaa wajjin walitti fiduuf kan hundeeffame inisheetivii dhuunfaa bilisaati. Akka waqfii fi sadaqaa itti-fufaatti qophaa\'e.',
-          highlightColor: '#BF360C',
-          accentColor: '#FF8F00',
-          buttonLabel: 'Beekumsa Barbaaduu Jalqabi',
-          nextStepTitle: 'Beekumsa Barbaaduu Jalqabi',
-          highlights: [
-            {
-              icon: 'gift-outline',
-              title: '100% Bilisa · Sadaqah Jariyah',
-              description: 'Waqfii ummataaf ta\'e, beeksisa fi kaffaltii tokkollee hin qabu.',
-            },
-            {
-              icon: 'people-outline',
-              title: 'Ummaticha Jabeessuu',
-              description: 'Namoota dhuunfaa fi maatii beekumsa amanamaadhaan humneessuuf.',
-            },
-            {
-              icon: 'phone-portrait-outline',
-              title: 'Fayyadamuuf Salphaa',
-              description: 'Barreeffama ifa, guddina qubee jijjiiruu fi haala halkan dubbisuu.',
-            },
-          ],
-          pillars: [
-            { title: 'Waqfii Dhaabbataa', subtitle: 'Kaffaltii hin qabu, 100% bilisa', icon: 'sparkles-outline' },
-            { title: 'Dabarsa Amanamaa', subtitle: 'Beekumsa dhugaa eeguu', icon: 'shield-checkmark-outline' },
-            { title: 'Masaraa Dijitaalaa', subtitle: 'Intarneetii malee amansiisaa', icon: 'server-outline' },
-          ],
-        },
       ];
 
     case 'en':
     default:
       return [
         {
+          id: 'bunyan',
+          badge: 'The Bunyan Initiative',
+          arabicBadge: 'مَنْ بَنَاهَا',
+          icon: 'layers-outline',
+          title: 'The Bunyan Initiative: Who Built This App',
+          arabicQuote: '« الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا »',
+          quoteTranslation: '«The believer to another believer is like a solid structure, each part strengthening the other.» (Sahih al-Bukhari & Muslim)',
+          description:
+            'Bunyan (بُنْيَان) is an independent non-profit digital initiative built to unite authentic Islamic scholarship with modern technology. Established purely as an open perpetual Waqf and continuous charity (Sadaqah Jariyah), Bunyan provides a clean, distraction-free sanctuary for Muslims around the world with zero ads or subscriptions.',
+          highlightColor: '#BF360C',
+          accentColor: '#FF8F00',
+          buttonLabel: 'Continue to The App',
+          nextStepTitle: 'Next: What the App Is',
+          highlights: [
+            {
+              icon: 'gift-outline',
+              title: '100% Free · Sadaqah Jariyah',
+              description: 'A perpetual Waqf for the Ummah with zero advertisements, paywalls, or subscriptions—ever.',
+            },
+            {
+              icon: 'shield-checkmark-outline',
+              title: 'Strengthening the Ummah',
+              description: 'Built to empower individuals, families, and study circles with reliable knowledge.',
+            },
+            {
+              icon: 'phone-portrait-outline',
+              title: 'Universal Accessibility',
+              description: 'Clean typography, adjustable font sizes, and dark mode for comfortable reading on any screen.',
+            },
+          ],
+          pillars: [
+            { title: 'Perpetual Waqf', subtitle: 'Zero monetization, 100% free', icon: 'sparkles-outline' },
+            { title: 'Authentic Transmission', subtitle: 'Preserving sound knowledge', icon: 'shield-checkmark-outline' },
+            { title: 'Digital Fortress', subtitle: 'Offline, secure & reliable', icon: 'server-outline' },
+          ],
+        },
+        {
+          id: 'courses',
+          badge: 'What the App Is · Kitabs',
+          arabicBadge: 'مَنَاهِجُ الدِّرَاسَةِ',
+          icon: 'book-outline',
+          title: 'What the App Is: Authentic Kitabs & Study System',
+          arabicQuote: '« مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ »',
+          quoteTranslation: 'Whoever treads a path seeking knowledge, Allah makes easy for him a path to Paradise. (Sahih Muslim)',
+          description:
+            'An authentic digital curriculum hosting 7 foundational classical Kitabs across Aqeedah, Hadith, and Fiqh. Features seamless synchronized PDF reading, seekable audio playback, offline range downloads, and complete 4-language support.',
+          highlightColor: '#0D47A1',
+          accentColor: '#00ACC1',
+          buttonLabel: 'Continue to The Sheikh',
+          nextStepTitle: 'Next: The Sheikhs',
+          highlights: [
+            {
+              icon: 'layers-outline',
+              title: '7 Classical Kitabs',
+              description: 'Structured curricula in Aqeedah (Tawheed, Usool ath-Thalathah, Qawa\'id al-Arba\'ah), Hadith, and Fiqh.',
+            },
+            {
+              icon: 'document-text-outline',
+              title: 'Instant PDF Textbook Reader',
+              description: 'Original Kitab manuscripts open immediately alongside audio playback with zero delays.',
+            },
+            {
+              icon: 'cloud-download-outline',
+              title: '100% Offline Study Mode',
+              description: 'Smart range downloads allow pausing, resuming, and full offline learning anywhere.',
+            },
+            {
+              icon: 'language-outline',
+              title: '4 Authentic Languages',
+              description: 'Full interface and translation support in Arabic, English, Amharic, and Afaan Oromoo.',
+            },
+          ],
+          curriculumCategories: [
+            { name: 'Aqeedah', arabic: 'عقيدة', color: '#1B5E20' },
+            { name: 'Hadith', arabic: 'حديث', color: '#BF360C' },
+            { name: 'Fiqh', arabic: 'فقه', color: '#4A148C' },
+          ],
+        },
+        {
           id: 'sheikhs',
           badge: 'Honoring the Sheikhs',
           arabicBadge: 'ادْعُوا لِلشَّيْخِ',
           icon: 'heart-circle-outline',
-          title: 'The Sheikhs: Custodians of Sacred Knowledge',
+          title: 'Who the Sheikh Is: Custodians of Sacred Knowledge',
           arabicQuote: '« جَزَاهُ ٱللَّٰهُ خَيْرًا وَغَفَرَ لَهُ وَنَفَعَ بِعِلْمِهِ »',
           quoteTranslation:
             'May Allah reward our teachers with the highest good, forgive them, and cause their sacred knowledge to benefit the Ummah.',
@@ -431,8 +510,8 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
             'Sacred knowledge in Islam is an inherited trust, faithfully transmitted through dedicated scholars and sincere teachers. Every series, audio recording, and lesson hosted here honors the lifelong devotion of the Sheikhs who taught the Quran and Sunnah. We invite every seeker to pray for their continuous reward and elevated status.',
           highlightColor: '#1B5E20',
           accentColor: '#D4AF37',
-          buttonLabel: 'Continue to The Courses',
-          nextStepTitle: 'Next: The Courses',
+          buttonLabel: 'Start Seeking Knowledge',
+          nextStepTitle: 'Start Seeking Knowledge',
           highlights: [
             {
               icon: 'ribbon-outline',
@@ -458,85 +537,6 @@ export function getWelcomeSlides(lang: SupportedLanguage = 'ar'): WelcomeSlide[]
             buttonText: 'Say Ameen for the Sheikh',
             buttonActiveText: 'Ameen · جَزَاكَ ٱللَّٰهُ خَيْرًا',
           },
-        },
-        {
-          id: 'courses',
-          badge: 'Curriculum & Courses',
-          arabicBadge: 'مَنَاهِجُ الدِّرَاسَةِ',
-          icon: 'book-outline',
-          title: 'Comprehensive Courses & Guided Paths',
-          arabicQuote: '« مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ »',
-          quoteTranslation: 'Whoever treads a path seeking knowledge, Allah makes easy for him a path to Paradise. (Sahih Muslim)',
-          description:
-            'Step into a structured educational curriculum spanning the foundational and advanced sciences of Islam. Each course is carefully organized into bite-sized lessons with audio, video, transcripts, and tracking so you can progress at your own pace.',
-          highlightColor: '#0D47A1',
-          accentColor: '#00ACC1',
-          buttonLabel: 'Continue to Bunyan',
-          nextStepTitle: 'Next: About Bunyan',
-          highlights: [
-            {
-              icon: 'layers-outline',
-              title: 'Step-by-Step Curricula',
-              description: 'Progressive levels from beginner primers to intermediate and advanced classical texts.',
-            },
-            {
-              icon: 'headset-outline',
-              title: 'Audio & Video Anywhere',
-              description: 'Seamless media playback designed for listening during commutes, daily routines, or focused study.',
-            },
-            {
-              icon: 'cloud-download-outline',
-              title: '100% Offline Study Mode',
-              description: 'Download whole courses or individual lessons to study anytime without requiring an internet connection.',
-            },
-            {
-              icon: 'checkmark-circle-outline',
-              title: 'Smart Progress Tracking',
-              description: 'Auto-saves playback positions and highlights completed lessons so you never lose your place.',
-            },
-          ],
-          curriculumCategories: [
-            { name: 'Aqeedah', arabic: 'عقيدة', color: '#1B5E20' },
-            { name: 'Hadith', arabic: 'حديث', color: '#BF360C' },
-            { name: 'Fiqh', arabic: 'فقه', color: '#4A148C' },
-          ],
-        },
-        {
-          id: 'bunyan',
-          badge: 'The Bunyan Platform',
-          arabicBadge: 'مُبَادَرَةُ بُنْيَان',
-          icon: 'layers-outline',
-          title: 'Bunyan: A Digital Fortress of Knowledge',
-          arabicQuote: '« الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا »',
-          quoteTranslation: 'The believer to another believer is like a solid structure, each part strengthening the other. (Sahih al-Bukhari)',
-          description:
-            'Bunyan (بُنْيَان) is an independent non-profit digital initiative built to unite authentic Islamic scholarship with modern technology. Established purely as an open perpetual Waqf and continuous charity (Sadaqah Jariyah), Bunyan provides a clean, distraction-free sanctuary for Muslims around the world.',
-          highlightColor: '#BF360C',
-          accentColor: '#FF8F00',
-          buttonLabel: 'Start Seeking Knowledge',
-          nextStepTitle: 'Start Seeking Knowledge',
-          highlights: [
-            {
-              icon: 'gift-outline',
-              title: '100% Free · Sadaqah Jariyah',
-              description: 'A perpetual Waqf for the Ummah with zero advertisements, paywalls, or subscriptions—ever.',
-            },
-            {
-              icon: 'people-outline',
-              title: 'Strengthening the Ummah',
-              description: 'Built to empower individuals, families, and study circles with reliable knowledge.',
-            },
-            {
-              icon: 'phone-portrait-outline',
-              title: 'Universal Accessibility',
-              description: 'Clean typography, adjustable font sizes, and dark mode for comfortable reading on any screen.',
-            },
-          ],
-          pillars: [
-            { title: 'Perpetual Waqf', subtitle: 'Zero monetization, 100% free', icon: 'sparkles-outline' },
-            { title: 'Authentic Transmission', subtitle: 'Preserving sound knowledge', icon: 'shield-checkmark-outline' },
-            { title: 'Digital Fortress', subtitle: 'Offline, secure & reliable', icon: 'server-outline' },
-          ],
         },
       ];
   }

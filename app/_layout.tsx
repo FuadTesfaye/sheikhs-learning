@@ -27,7 +27,8 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar style={theme === 'dark' ? 'light' : 'auto'} />
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false }} initialRouteName="index">
+        <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
         <Stack.Screen name="category/[id]" options={{ headerShown: true, headerTitle: 'Category', headerBackTitle: 'Back' }} />

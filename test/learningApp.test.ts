@@ -144,41 +144,52 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
     expect(courses[6].title).toBe('تَنْبِيهَاتٌ عَلَى أَحْكَامٍ تَخْتَصُّ بِالمُؤْمِنَاتِ');
   });
 
-  it('validates exactly 3 welcome pages covering The Sheikhs, The Courses, and Bunyan', async () => {
-    const { welcomeSlides } = await import('../src/data/welcomeData');
+  it('validates exactly 3 welcome pages covering Bunyan (who built it), The App (what it is), and The Sheikhs (who the Sheikh is)', async () => {
+    const { welcomeSlides, getWelcomeSlides } = await import('../src/data/welcomeData');
     expect(welcomeSlides.length).toBe(3);
 
-    // Page 1: The Sheikhs
-    const sheikhsSlide = welcomeSlides[0];
+    // Page 1: Bunyan (Who built it)
+    const bunyanSlide = welcomeSlides[0];
+    expect(bunyanSlide.id).toBe('bunyan');
+    expect(bunyanSlide.title).toContain('Bunyan');
+    expect(bunyanSlide.badge).toContain('Bunyan');
+    expect(bunyanSlide.arabicBadge).toBe('مَنْ بَنَاهَا');
+    expect(bunyanSlide.pillars).toBeDefined();
+    expect(bunyanSlide.pillars?.length).toBe(3);
+    expect(bunyanSlide.highlights.some(h => h.title.includes('Sadaqah Jariyah'))).toBe(true);
+    expect(bunyanSlide.buttonLabel).toBe('Continue to The App');
+
+    // Page 2: The Courses & App (What the app is)
+    const coursesSlide = welcomeSlides[1];
+    expect(coursesSlide.id).toBe('courses');
+    expect(coursesSlide.title).toContain('App');
+    expect(coursesSlide.arabicBadge).toBe('مَنَاهِجُ الدِّرَاسَةِ');
+    expect(coursesSlide.curriculumCategories).toBeDefined();
+    expect(coursesSlide.curriculumCategories?.length).toBe(3);
+    expect(coursesSlide.highlights.some(h => h.title.includes('Offline'))).toBe(true);
+    expect(coursesSlide.buttonLabel).toBe('Continue to The Sheikh');
+
+    // Page 3: The Sheikhs (Who the Sheikh is & Dua -> Start Seeking Knowledge)
+    const sheikhsSlide = welcomeSlides[2];
     expect(sheikhsSlide.id).toBe('sheikhs');
-    expect(sheikhsSlide.title).toContain('Sheikhs');
-    expect(sheikhsSlide.badge).toContain('Sheikhs');
+    expect(sheikhsSlide.title).toContain('Sheikh');
+    expect(sheikhsSlide.badge).toContain('Sheikh');
     expect(sheikhsSlide.arabicBadge).toBe('ادْعُوا لِلشَّيْخِ');
     expect(sheikhsSlide.duaCard).toBeDefined();
     expect(sheikhsSlide.duaCard?.arabic).toContain('اللَّهُمَّ اغْفِرْ لَهُ');
     expect(sheikhsSlide.duaCard?.buttonText).toContain('Say Ameen');
     expect(sheikhsSlide.highlights.length).toBeGreaterThanOrEqual(3);
+    expect(sheikhsSlide.buttonLabel).toBe('Start Seeking Knowledge');
 
-    // Page 2: The Courses
-    const coursesSlide = welcomeSlides[1];
-    expect(coursesSlide.id).toBe('courses');
-    expect(coursesSlide.title).toContain('Courses');
-    expect(coursesSlide.badge).toContain('Courses');
-    expect(coursesSlide.arabicBadge).toBe('مَنَاهِجُ الدِّرَاسَةِ');
-    expect(coursesSlide.curriculumCategories).toBeDefined();
-    expect(coursesSlide.curriculumCategories?.length).toBe(3);
-    expect(coursesSlide.highlights.some(h => h.title.includes('Offline'))).toBe(true);
-
-    // Page 3: Bunyan
-    const bunyanSlide = welcomeSlides[2];
-    expect(bunyanSlide.id).toBe('bunyan');
-    expect(bunyanSlide.title).toContain('Bunyan');
-    expect(bunyanSlide.badge).toContain('Bunyan');
-    expect(bunyanSlide.arabicBadge).toBe('مُبَادَرَةُ بُنْيَان');
-    expect(bunyanSlide.pillars).toBeDefined();
-    expect(bunyanSlide.pillars?.length).toBe(3);
-    expect(bunyanSlide.highlights.some(h => h.title.includes('Sadaqah Jariyah'))).toBe(true);
-    expect(bunyanSlide.buttonLabel).toBe('Start Seeking Knowledge');
+    // Verify all 4 languages preserve the exact 3-step narrative order
+    (['ar', 'en', 'am', 'om'] as const).forEach(lang => {
+      const slides = getWelcomeSlides(lang);
+      expect(slides.length).toBe(3);
+      expect(slides[0].id).toBe('bunyan');
+      expect(slides[1].id).toBe('courses');
+      expect(slides[2].id).toBe('sheikhs');
+      expect(slides[2].duaCard).toBeDefined();
+    });
   });
 
   it('manages onboarding completion state in settings store', () => {
@@ -284,12 +295,12 @@ describe("Sheikh's Islamic Learning App Core Tests", () => {
       expect(dict.about.bannerTitle).toBeTruthy();
       expect(dict.about.sheikhTitle).toBeTruthy();
 
-      // Check Welcome Slides for each language
+      // Check Welcome Slides for each language: 1. bunyan, 2. courses, 3. sheikhs
       const slides = getWelcomeSlides(lang);
       expect(slides.length).toBe(3);
-      expect(slides[0].id).toBe('sheikhs');
+      expect(slides[0].id).toBe('bunyan');
       expect(slides[1].id).toBe('courses');
-      expect(slides[2].id).toBe('bunyan');
+      expect(slides[2].id).toBe('sheikhs');
       expect(slides[0].badge).toBeTruthy();
       expect(slides[1].badge).toBeTruthy();
       expect(slides[2].badge).toBeTruthy();
